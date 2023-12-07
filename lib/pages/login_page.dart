@@ -38,9 +38,9 @@ class _LoginPageState extends State<LoginPage> {
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Color(0xff1E2E3D),
-                      Color(0xff152534),
-                      Color(0xff0C1C2E),
+                      Color(0xff7EB3BF),
+                      Color(0xff7EB3BF),
+                      Color(0xff7EB3BF),
                     ],
                   ),
                 ),
@@ -173,7 +173,7 @@ class _LoginPageState extends State<LoginPage> {
                             horizontal: 20,
                           ),
                           child: Text(
-                            'Or login with',
+                            'Or',
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall
@@ -190,38 +190,16 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(
                       height: 30,
                     ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () {},
-                            style: Theme.of(context).outlinedButtonTheme.style,
-                            icon: Image.network("https://exaktusa.com/wp-content/uploads/Icon-Placeholder.png",
-                              width: 14,
-                            ),
-                            label: const Text(
-                              'Google',
-                              style: TextStyle(color: Colors.black),
-                            ),
-                          ),
+                    FilledButton(
+                      onPressed: () => AppRoutes.registerScreen.pushName(),
+                      style: const ButtonStyle().copyWith(
+                        backgroundColor: MaterialStateProperty.all(
+                          _formKey.currentState?.validate() ?? false
+                              ? null
+                              : Colors.grey.shade300,
                         ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () {},
-                            style: Theme.of(context).outlinedButtonTheme.style,
-                            icon: Image.network("https://exaktusa.com/wp-content/uploads/Icon-Placeholder.png",
-                              width: 14
-                            ),
-                            label: const Text(
-                              'Facebook',
-                              style: TextStyle(color: Colors.black),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
+                      child: const Text('Register'),
                     ),
                   ],
                 ),
