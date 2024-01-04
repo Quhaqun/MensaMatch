@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:mensa_match_flutter/chat_message.dart';
 
+
+
+
 class ChatBubble extends StatefulWidget {
   final int index;
   final ChatMessage message;
   final Function(int) onDelete;
-  final Function(String, String) onUpdate; // Updated this line
+  final Function(String, String) onUpdate; // Corrected this line
 
   ChatBubble({
-    required Key key, // Add this line for the key parameter
+    required Key key,
     required this.index,
     required this.message,
     required this.onDelete,
     required this.onUpdate,
-  }) : super(key: key); // Call the super constructor with the provided key
+  }) : super(key: key);
+  // Call the super constructor with the provided key
 
   @override
   _ChatBubbleState createState() => _ChatBubbleState();
