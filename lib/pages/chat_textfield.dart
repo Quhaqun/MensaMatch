@@ -1,6 +1,7 @@
 // chat_textfield.dart
 import 'package:flutter/material.dart';
 
+
 class ChatTextField extends StatelessWidget {
   final Function(String, bool) onSendMessage;
 
