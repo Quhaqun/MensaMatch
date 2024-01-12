@@ -1,45 +1,39 @@
+import 'package:mensa_match/pages/login_page.dart';
+import 'package:mensa_match/pages/tabs_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
-import 'values/app_theme.dart';
-import 'pages/login_page.dart';
-import 'pages/register_page.dart';
-import 'values/app_constants.dart';
-import 'values/app_routes.dart';
+import 'appwrite/auth_api.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarIconBrightness: Brightness.light,
-    ),
-  );
-  SystemChrome.setPreferredOrientations(
-    [DeviceOrientation.portraitUp],
-  ).then(
-        (_) => runApp(
-      const MyApp(),
-    ),
-  );
+  // runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: ((context) => AuthAPI()), child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     Theme.of(context);
+    final value = context.watch<AuthAPI>().status;
+    print('TOP CHANGE Value changed to: $value!');
+
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Mensa Match',
-      theme: AppTheme.themeData,
-      initialRoute: AppRoutes.loginScreen,
-      navigatorKey: AppConstants.navigationKey,
-      routes: {
-        AppRoutes.loginScreen: (context) => const LoginPage(),
-        AppRoutes.registerScreen: (context) => const RegisterPage(),
-      },
-    );
+        title: 'Mensa Match',
+        debugShowCheckedModeBanner: false,
+        home: value == AuthStatus.uninitialized
+            ? const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        )
+            : value == AuthStatus.authenticated
+            ? const TabsPage()
+            : const LoginPage(),
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSwatch().copyWith(
+            primary: const Color(0xff0C1C2E),
+          ),
+        ));
   }
 }
