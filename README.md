@@ -19,11 +19,11 @@ samples, guidance on mobile development, and a full API reference.
 
 ### Priorität 1
 
-- Datenbank API Schnittstelle bauen (Mohammed) 5.01
-- Backend Funktionalitäten wie Login, Profilerstellung (Chris, Joanna)  5.01
-- Frontend Pages bauen ( Screens)  (Evan, Büsra)  15.01 ( ohne Funktionalitäten)
-- - Frontend Pages bauen ( Screens)    30.01 ( mit Funktionalitäten)
-- MatchFunktion bauen  30.01
+
+- Backend Funktionalitäten wie Login, Profilerstellung (Chris, Joanna)  17.01
+- Frontend Pages bauen ( Screens)  (Evan, Büsra)  26.01 ( ohne Funktionalitäten)
+- - Frontend Pages bauen ( Screens)    28.01 ( mit Funktionalitäten)
+- MatchFunktion bauen  28.01
 
 ### Priorität 2
 
