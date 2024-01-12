@@ -8,6 +8,10 @@ import '../utils/extensions.dart';
 import '../values/app_colors.dart';
 import '../values/app_constants.dart';
 
+import 'package:mensa_match/appwrite/auth.dart';
+import 'package:appwrite/appwrite.dart';
+import 'package:provider/provider.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -21,6 +25,52 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController passwordController = TextEditingController();
 
   bool isObscure = true;
+
+  signIn() async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: const [
+                  CircularProgressIndicator(),
+                ]),
+          );
+        });
+
+    try {
+      final AuthAPI appwrite = context.read<AuthAPI>();
+      await appwrite.createEmailSession(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+      Navigator.pop(context);
+    } on AppwriteException catch (e) {
+      Navigator.pop(context);
+      showAlert(title: 'Login failed', text: e.message.toString());
+    }
+  }
+
+  showAlert({required String title, required String text}) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(text),
+            actions: [
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Ok'))
+            ],
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -138,17 +188,20 @@ class _LoginPageState extends State<LoginPage> {
                       height: 15,
                     ),
                     FilledButton(
-                      onPressed: _formKey.currentState?.validate() ?? false
-                          ? () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Logged In!'),
-                                ),
-                              );
-                              emailController.clear();
-                              passwordController.clear();
-                            }
-                          : null,
+                      onPressed: () {
+                        signIn();
+                      },
+                      // onPressed: _formKey.currentState?.validate() ?? false
+                      //     ? () {
+                      //         ScaffoldMessenger.of(context).showSnackBar(
+                      //           const SnackBar(
+                      //             content: Text('Logged In!'),
+                      //           ),
+                      //         );
+                      //         emailController.clear();
+                      //         passwordController.clear();
+                      //       }
+                      //     : null,
                       style: const ButtonStyle().copyWith(
                         backgroundColor: MaterialStateProperty.all(
                           _formKey.currentState?.validate() ?? false

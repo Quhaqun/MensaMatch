@@ -5,6 +5,10 @@ import '../utils/extensions.dart';
 import '../values/app_colors.dart';
 import '../values/app_constants.dart';
 
+import 'package:mensa_match/appwrite/auth.dart';
+import 'package:appwrite/appwrite.dart';
+import 'package:provider/provider.dart';
+
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
@@ -14,15 +18,78 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController nameController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController confirmPasswordController = TextEditingController();
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
   // FocusNode confirmFocusNode = FocusNode();
 
   bool isObscure = true;
   bool isConfirmPasswordObscure = true;
+
+  createAccount() async {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: const [
+                  CircularProgressIndicator(),
+                ]),
+          );
+        });
+
+    try {
+      final AuthAPI appwrite = context.read<AuthAPI>();
+
+      await appwrite.createUser(
+        name: nameController.text,
+        email: emailController.text,
+        password: passwordController.text,
+      );
+
+      Navigator.pop(context);
+      const snackbar = SnackBar(content: Text('Account created!'));
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    } on AppwriteException catch (e) {
+      Navigator.pop(context);
+      showAlert(title: 'Account creation failed', text: e.message.toString());
+    }
+
+    try {
+      final AuthAPI appwrite = context.read<AuthAPI>();
+      await appwrite.createEmailSession(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+      Navigator.pop(context);
+    } on AppwriteException catch (e) {
+      Navigator.pop(context);
+      showAlert(title: 'Login failed', text: e.message.toString());
+    }
+  }
+
+  showAlert({required String title, required String text}) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(text),
+            actions: [
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Ok'))
+            ],
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,13 +188,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     keyboardType: TextInputType.visiblePassword,
                     textInputAction: TextInputAction.next,
                     onChanged: (_) => _formKey.currentState?.validate(),
-                    validator: (value) {
-                      return value!.isEmpty
-                          ? 'Please, Enter Password'
-                          : AppConstants.passwordRegex.hasMatch(value)
-                              ? null
-                              : 'Invalid Password';
-                    },
+                    // validator: (value) {
+                    //   return value!.isEmpty
+                    //       ? 'Please, Enter Password'
+                    //       : AppConstants.passwordRegex.hasMatch(value)
+                    //           ? null
+                    //           : 'Invalid Password';
+                    // },
                     controller: passwordController,
                     obscureText: isObscure,
                     // onEditingComplete: () {
@@ -173,16 +240,16 @@ class _RegisterPageState extends State<RegisterPage> {
                     onChanged: (value) {
                       _formKey.currentState?.validate();
                     },
-                    validator: (value) {
-                      return value!.isEmpty
-                          ? 'Please, Re-Enter Password'
-                          : AppConstants.passwordRegex.hasMatch(value)
-                              ? passwordController.text ==
-                                      confirmPasswordController.text
-                                  ? null
-                                  : 'Password not matched!'
-                              : 'Invalid Password!';
-                    },
+                    // validator: (value) {
+                    //   return value!.isEmpty
+                    //       ? 'Please, Re-Enter Password'
+                    //       : AppConstants.passwordRegex.hasMatch(value)
+                    //           ? passwordController.text ==
+                    //                   confirmPasswordController.text
+                    //               ? null
+                    //               : 'Password not matched!'
+                    //           : 'Invalid Password!';
+                    // },
                     controller: confirmPasswordController,
                     obscureText: isConfirmPasswordObscure,
                     suffixIcon: Padding(
@@ -220,19 +287,23 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                   FilledButton(
-                    onPressed: _formKey.currentState?.validate() ?? false
-                        ? () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Registration Complete!'),
-                              ),
-                            );
-                            nameController.clear();
-                            emailController.clear();
-                            passwordController.clear();
-                            confirmPasswordController.clear();
-                          }
-                        : null,
+                    onPressed: () {
+                      createAccount();
+                    },
+                    // onPressed: _formKey.currentState?.validate() ?? false
+                    //     ? () {
+                    //         createAccount();
+                    //         // ScaffoldMessenger.of(context).showSnackBar(
+                    //         //   const SnackBar(
+                    //         //     content: Text('Registration Complete!'),
+                    //         //   ),
+                    //         // );
+                    //         // nameController.clear();
+                    //         // emailController.clear();
+                    //         // passwordController.clear();
+                    //         // confirmPasswordController.clear();
+                    //       }
+                    //     : null,
                     style: const ButtonStyle().copyWith(
                       backgroundColor: MaterialStateProperty.all(
                         _formKey.currentState?.validate() ?? false
