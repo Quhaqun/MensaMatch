@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:provider/provider.dart';
+import 'toolbar.dart';
 
 class TabsPage extends StatefulWidget {
   const TabsPage({Key? key}) : super(key: key);
@@ -28,24 +29,15 @@ class _TabsPageState extends State<TabsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.message_outlined), label: "Messages"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle_outlined), label: "Account")
-        ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-      ),
-       body: Center(
-         child: TextButton(
-           onPressed: (){
-             signOut();
-           },
-           child: const Text("sign out"),
-         ),
-       )
+        body: Center(
+          child: TextButton(
+            onPressed: (){
+              signOut();
+            },
+            child: const Text("sign out"),
+          ),
+        ),
+      bottomNavigationBar: MyIconToolbar(),
     );
   }
 }
