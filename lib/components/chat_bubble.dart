@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mensa_match/pages/chat_message.dart';
-
-
-
+import 'package:mensa_match/components/chat_message.dart';
 
 class ChatBubble extends StatefulWidget {
   final int index;

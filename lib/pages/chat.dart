@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:appwrite/appwrite.dart';
-import 'chat_bubble.dart';
+import 'package:mensa_match/components/chat_message.dart';
+import 'package:mensa_match/components/chat_bubble.dart';
 import 'toolbar.dart';
-import 'chat_textfield.dart';
-import 'chat_message.dart'; // Import the chat_message file
+import '../components/chat_textfield.dart';
 
 const String projectID = "657c5f8ee668aff8af1f";
 const String databaseId = "657c5fae0ebe939915f8";
 const String url = "https://god-did.de/v1";
 const String chatCollection = "657c663392ac1f6bfa49";
-
 
 class ChatScreen extends StatefulWidget {
   static final client = Client();
@@ -17,8 +16,8 @@ class ChatScreen extends StatefulWidget {
 
   ChatScreen() : super();
 
-@override
-_ChatScreenState createState() => _ChatScreenState();
+  @override
+  _ChatScreenState createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
@@ -58,7 +57,6 @@ class _ChatScreenState extends State<ChatScreen> {
     final client = Client();
     final databases = Databases(client);
 
-
     try {
       final response = null;
       /*final response = await client.createDocument(
@@ -83,10 +81,10 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-
   void deleteMessage(String documentId) {
     print("Deleting message with documentId $documentId");
-    final deletedMessage = messages.firstWhere((message) => message.documentId == documentId);
+    final deletedMessage =
+        messages.firstWhere((message) => message.documentId == documentId);
 
     if (mounted) {
       setState(() {
@@ -99,7 +97,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void updateMessage(String documentId, String newText) {
-    final index = messages.indexWhere((message) => message.documentId == documentId);
+    final index =
+        messages.indexWhere((message) => message.documentId == documentId);
     if (index != -1) {
       print("Updating message at index $index with text: $newText");
       final updatedMessage = messages[index];

@@ -1,7 +1,11 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:flutter/material.dart';
+import 'package:mensa_match/components/button_primary.dart';
+import 'package:mensa_match/components/input_textfield.dart';
 import 'package:provider/provider.dart';
+
+import 'package:mensa_match/constants/colors.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -66,8 +70,10 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColorLight,
       appBar: AppBar(
         title: const Text('Register'),
+        backgroundColor: AppColors.backgroundColorLight,
       ),
       body: Center(
         child: Padding(
@@ -76,38 +82,12 @@ class _RegisterPageState extends State<RegisterPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Name',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: emailTextController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: passwordTextController,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
-                ),
-                obscureText: true,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () {
-                  createAccount();
-                },
-                icon: const Icon(Icons.app_registration),
-                label: const Text('Sign up'),
-              ),
+              input_textfield(controller: nameController, labelText: 'Name'),
+              input_textfield(
+                  controller: emailTextController, labelText: 'Email'),
+              input_textfield(
+                  controller: passwordTextController, labelText: 'Password'),
+              button_primary(buttonText: 'Sign up', onPressed: createAccount)
             ],
           ),
         ),

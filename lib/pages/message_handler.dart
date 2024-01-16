@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:uuid/uuid.dart';
-import 'chat_message.dart';
+import "package:mensa_match/components/chat_message.dart";
 
 List<ChatMessage> messages = [];
 Function() onMessagesChanged = () {}; // Callback for notifying listeners
