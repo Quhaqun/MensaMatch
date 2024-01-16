@@ -30,10 +30,6 @@ class MyApp extends StatelessWidget {
             : value == AuthStatus.authenticated
             ? const TabsPage()
             : const LoginPage(),
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSwatch().copyWith(
-            primary: const Color(0xff0C1C2E),
-          ),
-        ));
+        );
   }
 }

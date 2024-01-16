@@ -1,9 +1,14 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
+import 'package:mensa_match/components/button_primary.dart';
+import 'package:mensa_match/components/input_textfield.dart';
 import 'package:mensa_match/pages/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+
+import 'package:mensa_match/constants/colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -74,8 +79,10 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundColorLight,
       appBar: AppBar(
         title: const Text('Welcome to MensaMatch'),
+        backgroundColor: AppColors.backgroundColorLight,
       ),
       body: Center(
         child: Padding(
@@ -84,42 +91,36 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextField(
-                controller: emailTextController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
+              // Email textfield
+              input_textfield(
+                  controller: emailTextController, labelText: "Email"),
+              // Password textfield
+              input_textfield(
+                  controller: passwordTextController, labelText: "Password"),
+              // Sign In button
+              button_primary(buttonText: "Sign In", onPressed: signIn),
+              // OR
+              Center(
+                child: Text(
+                  "or",
+                  style: GoogleFonts.roboto(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                    color: AppColors.textColorGray,
+                  ),
                 ),
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: passwordTextController,
-                decoration: const InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
-                ),
-                obscureText: true,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () {
-                  signIn();
-                },
-                icon: const Icon(Icons.login),
-                label: const Text("Sign in"),
-              ),
+              // Register textfield
+              button_primary(
+                  buttonText: "Register",
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const RegisterPage()));
+                  }),
               TextButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const RegisterPage()));
-                },
-                child: const Text('Create Account'),
-              ),
-              TextButton(
-                onPressed: () {
-                },
+                onPressed: () {},
                 child: const Text('Read Messages as Guest'),
               ),
               const SizedBox(height: 16),
@@ -132,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                         foregroundColor: Colors.black,
                         backgroundColor: Colors.white),
                     child:
-                    SvgPicture.asset('assets/google_icon.svg', width: 12),
+                        SvgPicture.asset('assets/google_icon.svg', width: 12),
                   ),
                   ElevatedButton(
                     onPressed: () => signInWithProvider('apple'),
@@ -147,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                         foregroundColor: Colors.black,
                         backgroundColor: Colors.white),
                     child:
-                    SvgPicture.asset('assets/github_icon.svg', width: 12),
+                        SvgPicture.asset('assets/github_icon.svg', width: 12),
                   ),
                   ElevatedButton(
                     onPressed: () => signInWithProvider('twitter'),
@@ -155,7 +156,7 @@ class _LoginPageState extends State<LoginPage> {
                         foregroundColor: Colors.black,
                         backgroundColor: Colors.white),
                     child:
-                    SvgPicture.asset('assets/twitter_icon.svg', width: 12),
+                        SvgPicture.asset('assets/twitter_icon.svg', width: 12),
                   )
                 ],
               ),
