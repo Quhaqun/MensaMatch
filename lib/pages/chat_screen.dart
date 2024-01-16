@@ -26,32 +26,36 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.builder(
-            itemCount: messages.length,
-            itemBuilder: (context, index) {
-              final message = messages[index];
-              return ChatBubble(
-                key: Key(message.documentId),
-                index: index,
-                message: message,
-                onDelete: (int index) => deleteMessage(message.documentId),
-                onUpdate: (String documentId, String newText) =>
-                    updateMessage(documentId, newText),
-              );
-            },
+    return Scaffold(
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              reverse: true,
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final message = messages[index];
+                return ChatBubble(
+                  key: Key(message.documentId),
+                  index: index,
+                  message: message,
+                  onDelete: (int index) => deleteMessage(message.documentId),
+                  onUpdate: (String documentId, String newText) =>
+                      updateMessage(documentId, newText),
+                );
+              },
+            ),
           ),
-        ),
-        ChatTextField(
-          onSendMessage: saveMessage,
-        ),
-        SizedBox(height: 20),
-        MyIconToolbar(),
-      ],
+          ChatTextField(
+            onSendMessage: saveMessage,
+          ),
+          SizedBox(height: 20),
+          MyIconToolbar(),
+        ],
+      ),
     );
   }
+
 
   Future<void> saveMessage(String text, bool isSentByUser) async {
     // Remove 'const' here
