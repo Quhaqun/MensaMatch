@@ -6,7 +6,7 @@ import 'package:mensa_match/pages/chat_message.dart';
 
 class ChatBubble extends StatefulWidget {
   final int index;
-  final ChatMessage message;
+  final Message message;
   final Function(int) onDelete;
   final Function(String, String) onUpdate; // Corrected this line
 
