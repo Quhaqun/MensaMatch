@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mensa_match/pages/chat_message.dart';
 
-
-
-
 class ChatBubble extends StatefulWidget {
   final int index;
-  final Message message;
+  final ChatMessage message;
   final Function(int) onDelete;
-  final Function(String, String) onUpdate; // Corrected this line
+  final Function(String, String) onUpdate;
 
   ChatBubble({
     required Key key,
@@ -17,12 +14,10 @@ class ChatBubble extends StatefulWidget {
     required this.onDelete,
     required this.onUpdate,
   }) : super(key: key);
-  // Call the super constructor with the provided key
 
   @override
   _ChatBubbleState createState() => _ChatBubbleState();
 }
-
 
 class _ChatBubbleState extends State<ChatBubble> {
   late String editedText;
@@ -36,7 +31,8 @@ class _ChatBubbleState extends State<ChatBubble> {
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: widget.message.isSentByUser ? Alignment.bottomRight : Alignment.bottomLeft,
+      alignment:
+      widget.message.isSentByUser ? Alignment.bottomRight : Alignment.bottomLeft,
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 8),
         child: Container(
@@ -75,7 +71,8 @@ class _ChatBubbleState extends State<ChatBubble> {
   }
 
   void _showEditDialog(BuildContext context) {
-    TextEditingController textController = TextEditingController(text: widget.message.text);
+    TextEditingController textController =
+    TextEditingController(text: widget.message.text);
 
     showDialog(
       context: context,
@@ -100,7 +97,7 @@ class _ChatBubbleState extends State<ChatBubble> {
                 setState(() {
                   editedText = textController.text;
                 });
-                widget.onUpdate(widget.message.documentId, textController.text); // Updated this line
+                widget.onUpdate(widget.message.documentId, textController.text);
                 Navigator.of(context).pop();
               },
               child: Text('Save'),

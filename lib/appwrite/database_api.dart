@@ -2,8 +2,9 @@ import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:mensa_match/appwrite/constants.dart';
+import 'package:flutter/widgets.dart';
 
-class DatabaseAPI {
+class DatabaseAPI extends ChangeNotifier {  // Ensure that DatabaseAPI extends ChangeNotifier
   Client client = Client();
   late final Account account;
   late final Databases databases;
