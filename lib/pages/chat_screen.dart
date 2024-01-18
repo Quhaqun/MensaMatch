@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 class MessagesPage extends StatefulWidget {
   const MessagesPage({Key? key}) : super(key: key);
 
-
   @override
   _MessagesPageState createState() => _MessagesPageState();
 }
@@ -29,9 +28,7 @@ class _MessagesPageState extends State<MessagesPage> {
 
   loadMessages() async {
     try {
-      print("Before database.getMessages()");
       final value = await database.getMessages();
-      print("After database.getMessages()");
       setState(() {
         messages = value.documents;
       });
@@ -42,11 +39,7 @@ class _MessagesPageState extends State<MessagesPage> {
 
   addMessage() async {
     try {
-      print("DEBUG1");
       await database.addMessage(message: messageTextController.text);
-      print("DEBUG2");
-      const snackbar = SnackBar(content: Text('Message added!'));
-      ScaffoldMessenger.of(context).showSnackBar(snackbar);
       messageTextController.clear();
       loadMessages();
     } on AppwriteException catch (e) {
@@ -63,22 +56,33 @@ class _MessagesPageState extends State<MessagesPage> {
     }
   }
 
+  updateMessage(String id) async {
+    try {
+      await database.updateMessage(id: id);
+      loadMessages();
+    } on AppwriteException catch (e) {
+      showAlert(title: 'Error', text: e.message.toString());
+    }
+  }
+
   showAlert({required String title, required String text}) {
     showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(title),
-            content: Text(text),
-            actions: [
-              ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Ok'))
-            ],
-          );
-        });
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(text),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Ok'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -87,52 +91,97 @@ class _MessagesPageState extends State<MessagesPage> {
       appBar: AppBar(
         title: const Text('Messages'),
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              reverse: true, // Reverse the order to display messages from bottom to top
+              itemCount: messages?.length ?? 0,
+              itemBuilder: (context, index) {
+                final reversedIndex = (messages!.length - 1) - index;
+                final message = messages![reversedIndex];
+                return GestureDetector(
+                  onLongPress: () {
+                    // Show a confirmation dialog before deleting the message
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Delete Message'),
+                          content: const Text('Are you sure you want to delete this message?'),
+                          actions: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Cancel'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                deleteMessage(message.$id);
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Delete'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        // Your code to display chat bubbles
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(message.data['text']),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          if (authStatus == AuthStatus.authenticated)
+            Row(
               children: [
-                authStatus == AuthStatus.authenticated
-                    ? Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: messageTextController,
-                        decoration: const InputDecoration(
-                            hintText: 'Type a message'),
+                Expanded(
+                  child: TextField(
+                    controller: messageTextController,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      hintText: 'Type a message',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(50.0),
+                        borderSide: BorderSide.none,
                       ),
                     ),
-                    const SizedBox(width: 10),
-                    ElevatedButton.icon(
-                        onPressed: () {
-                          addMessage();
-                        },
-                        icon: const Icon(Icons.send),
-                        label: const Text("Send")),
-                  ],
-                )
-                    : const Center(),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: ListView.builder(
-                      itemCount: messages?.length ?? 0,
-                      itemBuilder: (context, index) {
-                        final message = messages![index];
-                        return Card(
-                            child: ListTile(
-                              title: Text(message.data['text']),
-                              trailing: IconButton(
-                                  onPressed: () {
-                                    deleteMessage(message.$id);
-                                  },
-                                  icon: const Icon(Icons.delete)),
-                            ));
-                      }),
-                )
-              ]),
-        ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    addMessage();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.all(0.0),
+                    child: Icon(Icons.send),
+                  ),
+                ),
+              ],
+            ),
+        ],
       ),
     );
   }

@@ -49,6 +49,9 @@ class DatabaseAPI {
         documentId: id);
   }
   Future<dynamic> updateMessage({required String id}) {
-    //TODO implement
+    return databases.updateDocument(
+        databaseId: APPWRITE_DATABASE_ID,
+        collectionId: COLLECTION_MESSAGES,
+        documentId: id);
   }
 }
