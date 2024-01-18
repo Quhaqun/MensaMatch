@@ -4,6 +4,9 @@ import 'package:mensa_match/appwrite/database_api.dart';
 import 'package:flutter/material.dart';
 import 'package:appwrite/models.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart'; // Import CachedNetworkImage package
+import 'package:mensa_match/pages/custom_app_bar.dart';
+
 
 class MessagesPage extends StatefulWidget {
   const MessagesPage({Key? key}) : super(key: key);
@@ -18,11 +21,15 @@ class _MessagesPageState extends State<MessagesPage> {
   TextEditingController messageTextController = TextEditingController();
   AuthStatus authStatus = AuthStatus.uninitialized;
 
+  // Access the AuthAPI instance from the widget tree
+  late AuthAPI authAPI;
+
   @override
   void initState() {
     super.initState();
-    final AuthAPI appwrite = context.read<AuthAPI>();
-    authStatus = appwrite.status;
+    // Get the AuthAPI instance from the context
+    authAPI = context.read<AuthAPI>();
+    authStatus = authAPI.status;
     loadMessages();
   }
 
@@ -36,6 +43,9 @@ class _MessagesPageState extends State<MessagesPage> {
       print("Error in loadMessages(): $e");
     }
   }
+
+
+
 
   addMessage() async {
     try {
@@ -88,21 +98,54 @@ class _MessagesPageState extends State<MessagesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Messages'),
-      ),
+      appBar: CustomAppBar(
+          name: authAPI.username ?? '',
+          age: 26,
+        onBackPress: () {
+          //Navigator.pop(context);
+          // Handle back arrow press in chat_screen.dart
+        },
+        /* Provide age here */), // Use the TopProfileBar
       body: Column(
-        children: [
+        children:  [
+          // Top Section
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            color: Colors.blue, // Adjust the color as needed
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 25,
+                  backgroundColor: Colors.white,
+                  child: IconButton(
+                    icon: Icon(Icons.account_circle, size: 40),
+                    onPressed: () {
+                      // Handle own profile access
+                      // You might want to navigate to the profile screen or perform a custom action.
+                    },
+                  ),
+                ),
+                SizedBox(width: 16.0),
+                Text(
+                  authAPI.username ?? 'Guest',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: ListView.builder(
-              reverse: true, // Reverse the order to display messages from bottom to top
+              reverse: true,
               itemCount: messages?.length ?? 0,
               itemBuilder: (context, index) {
                 final reversedIndex = (messages!.length - 1) - index;
                 final message = messages![reversedIndex];
                 return GestureDetector(
                   onLongPress: () {
-                    // Show a confirmation dialog before deleting the message
                     showDialog(
                       context: context,
                       builder: (context) {
@@ -133,7 +176,6 @@ class _MessagesPageState extends State<MessagesPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        // Your code to display chat bubbles
                         Card(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
