@@ -46,7 +46,7 @@ class _MyIconToolbarState extends State<MyIconToolbar> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ChatScreen()
+                builder: (context) => MessagesPage()
             )
         );
         break;

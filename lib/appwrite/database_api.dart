@@ -4,7 +4,7 @@ import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:mensa_match/appwrite/constants.dart';
 import 'package:flutter/widgets.dart';
 
-class DatabaseAPI extends ChangeNotifier {  // Ensure that DatabaseAPI extends ChangeNotifier
+class DatabaseAPI {
   Client client = Client();
   late final Account account;
   late final Databases databases;
@@ -37,7 +37,7 @@ class DatabaseAPI extends ChangeNotifier {  // Ensure that DatabaseAPI extends C
         documentId: ID.unique(),
         data: {
           'text': message,
-          'date': DateTime.now().toString(),
+          'timestamp': DateTime.now().toString(),
           'user_id': auth.userid
         });
   }
@@ -47,5 +47,8 @@ class DatabaseAPI extends ChangeNotifier {  // Ensure that DatabaseAPI extends C
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_MESSAGES,
         documentId: id);
+  }
+  Future<dynamic> updateMessage({required String id}) {
+    //TODO implement
   }
 }
