@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mensa_match/pages/tabs_page.dart';
+import 'package:mensa_match/pages/home.dart';
 import 'package:mensa_match/pages/chat.dart';
 
 class MyIconToolbar extends StatefulWidget {
