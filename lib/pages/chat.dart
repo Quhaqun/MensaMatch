@@ -1,114 +1,188 @@
-import 'package:flutter/material.dart';
 import 'package:appwrite/appwrite.dart';
-import 'package:mensa_match/components/chat_message.dart';
-import 'package:mensa_match/components/chat_bubble.dart';
-import 'package:mensa_match/components/toolbar.dart';
-import '../components/chat_textfield.dart';
+import 'package:mensa_match/appwrite/auth_api.dart';
+import 'package:mensa_match/appwrite/database_api.dart';
+import 'package:flutter/material.dart';
+import 'package:appwrite/models.dart';
+import 'package:provider/provider.dart';
 
-const String projectID = "657c5f8ee668aff8af1f";
-const String databaseId = "657c5fae0ebe939915f8";
-const String url = "https://god-did.de/v1";
-const String chatCollection = "657c663392ac1f6bfa49";
-
-class ChatScreen extends StatefulWidget {
-  static final client = Client();
-  static final databases = Databases(client);
-
-  ChatScreen() : super();
+class MessagesPage extends StatefulWidget {
+  const MessagesPage({Key? key}) : super(key: key);
 
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  _MessagesPageState createState() => _MessagesPageState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
-  List<ChatMessage> messages = [];
+class _MessagesPageState extends State<MessagesPage> {
+  final database = DatabaseAPI();
+  late List<Document>? messages = [];
+  TextEditingController messageTextController = TextEditingController();
+  AuthStatus authStatus = AuthStatus.uninitialized;
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.builder(
-            itemCount: messages.length,
-            itemBuilder: (context, index) {
-              final message = messages[index];
-              return ChatBubble(
-                key: Key(message.documentId),
-                index: index,
-                message: message,
-                onDelete: (int index) => deleteMessage(message.documentId),
-                onUpdate: (String documentId, String newText) =>
-                    updateMessage(documentId, newText),
-              );
-            },
-          ),
-        ),
-        ChatTextField(
-          onSendMessage: saveMessage,
-        ),
-        SizedBox(height: 20),
-        MyIconToolbar(),
-      ],
+  void initState() {
+    super.initState();
+    final AuthAPI appwrite = context.read<AuthAPI>();
+    authStatus = appwrite.status;
+    loadMessages();
+  }
+
+  loadMessages() async {
+    try {
+      final value = await database.getMessages();
+      setState(() {
+        messages = value.documents;
+      });
+    } catch (e) {
+      print("Error in loadMessages(): $e");
+    }
+  }
+
+  addMessage() async {
+    try {
+      await database.addMessage(message: messageTextController.text);
+      messageTextController.clear();
+      loadMessages();
+    } on AppwriteException catch (e) {
+      showAlert(title: 'Error', text: e.message.toString());
+    }
+  }
+
+  deleteMessage(String id) async {
+    try {
+      await database.deleteMessage(id: id);
+      loadMessages();
+    } on AppwriteException catch (e) {
+      showAlert(title: 'Error', text: e.message.toString());
+    }
+  }
+
+  updateMessage(String id) async {
+    try {
+      await database.updateMessage(id: id);
+      loadMessages();
+    } on AppwriteException catch (e) {
+      showAlert(title: 'Error', text: e.message.toString());
+    }
+  }
+
+  showAlert({required String title, required String text}) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(text),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Ok'),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  Future<void> saveMessage(String text, bool isSentByUser) async {
-    // Remove 'const' here
-    final client = Client();
-    final databases = Databases(client);
-
-    try {
-      final response = null;
-      /*final response = await client.createDocument(
-        collectionId: chatCollection,
-        data: {'text': text, 'isSentByUser': isSentByUser},
-      );*/
-
-      final documentId = response.data['\$id'];
-
-      final newMessage = ChatMessage(
-        documentId: documentId,
-        text: text,
-        isSentByUser: isSentByUser,
-        timestamp: DateTime.now().millisecondsSinceEpoch,
-      );
-
-      setState(() {
-        messages.add(newMessage);
-      });
-    } catch (e) {
-      print('Error saving message: $e');
-    }
-  }
-
-  void deleteMessage(String documentId) {
-    print("Deleting message with documentId $documentId");
-    final deletedMessage =
-        messages.firstWhere((message) => message.documentId == documentId);
-
-    if (mounted) {
-      setState(() {
-        messages.removeWhere((message) => message.documentId == documentId);
-      });
-    }
-
-    print("Deleted Message: $deletedMessage");
-    print("Messages after deletion: $messages");
-  }
-
-  void updateMessage(String documentId, String newText) {
-    final index =
-        messages.indexWhere((message) => message.documentId == documentId);
-    if (index != -1) {
-      print("Updating message at index $index with text: $newText");
-      final updatedMessage = messages[index];
-      setState(() {
-        messages[index] = updatedMessage.copyWithNewText(newText);
-      });
-      print("Updated Message: $updatedMessage");
-      print("Messages after update: $messages");
-    } else {
-      print("Message with documentId $documentId not found for update.");
-    }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Messages'),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              reverse: true, // Reverse the order to display messages from bottom to top
+              itemCount: messages?.length ?? 0,
+              itemBuilder: (context, index) {
+                final reversedIndex = (messages!.length - 1) - index;
+                final message = messages![reversedIndex];
+                return GestureDetector(
+                  onLongPress: () {
+                    // Show a confirmation dialog before deleting the message
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Delete Message'),
+                          content: const Text('Are you sure you want to delete this message?'),
+                          actions: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Cancel'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                deleteMessage(message.$id);
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Delete'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        // Your code to display chat bubbles
+                        Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(message.data['text']),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          if (authStatus == AuthStatus.authenticated)
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: messageTextController,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      hintText: 'Type a message',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(50.0),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    addMessage();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.all(0.0),
+                    child: Icon(Icons.send),
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
   }
 }
