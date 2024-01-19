@@ -2,6 +2,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:mensa_match/components/button_primary.dart';
 import 'package:mensa_match/components/input_textfield.dart';
+import 'package:mensa_match/components/wave_background.dart';
 import 'package:mensa_match/pages/register.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -27,11 +28,11 @@ class _LoginPageState extends State<LoginPage> {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return Dialog(
+          return const Dialog(
             backgroundColor: Colors.transparent,
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: const [
+                children: [
                   CircularProgressIndicator(),
                 ]),
           );
@@ -80,87 +81,61 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColorLight,
-      appBar: AppBar(
-        title: const Text('Welcome to MensaMatch'),
-        backgroundColor: AppColors.backgroundColorLight,
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Email textfield
-              input_textfield(
-                  controller: emailTextController, labelText: "Email"),
-              // Password textfield
-              input_textfield(
-                  controller: passwordTextController, labelText: "Password"),
-              // Sign In button
-              button_primary(buttonText: "Sign In", onPressed: signIn),
-              // OR
-              Center(
-                child: Text(
-                  "or",
-                  style: GoogleFonts.roboto(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textColorGray,
+      body: CustomPaint(
+        painter: WaveBackgroundPainter(),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        "[M]",
+                        style: TextStyle(fontSize: 78),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'MensaMatch',
+                        style: TextStyle(fontSize: 24),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              // Register textfield
-              button_primary(
-                  buttonText: "Register",
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const RegisterPage()));
-                  }),
-              TextButton(
-                onPressed: () {},
-                child: const Text('Read Messages as Guest'),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    onPressed: () => signInWithProvider('google'),
-                    style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        backgroundColor: Colors.white),
-                    child:
-                        SvgPicture.asset('assets/google_icon.svg', width: 12),
+                const Spacer(),
+                // Email textfield
+                input_textfield(
+                    controller: emailTextController, labelText: "Email"),
+                // Password textfield
+                input_textfield(
+                    controller: passwordTextController, labelText: "Password"),
+                // Sign In button
+                button_primary(buttonText: "Sign In", onPressed: signIn),
+                // OR
+                Center(
+                  child: Text(
+                    "or",
+                    style: GoogleFonts.roboto(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.textColorGray,
+                    ),
                   ),
-                  ElevatedButton(
-                    onPressed: () => signInWithProvider('apple'),
-                    style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        backgroundColor: Colors.white),
-                    child: SvgPicture.asset('assets/apple_icon.svg', width: 12),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => signInWithProvider('github'),
-                    style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        backgroundColor: Colors.white),
-                    child:
-                        SvgPicture.asset('assets/github_icon.svg', width: 12),
-                  ),
-                  ElevatedButton(
-                    onPressed: () => signInWithProvider('twitter'),
-                    style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        backgroundColor: Colors.white),
-                    child:
-                        SvgPicture.asset('assets/twitter_icon.svg', width: 12),
-                  )
-                ],
-              ),
-            ],
+                ),
+                // Register textfield
+                button_primary(
+                    buttonText: "Register",
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const RegisterPage()));
+                    }),
+              ],
+            ),
           ),
         ),
       ),

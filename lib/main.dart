@@ -1,5 +1,6 @@
 import 'package:mensa_match/pages/login.dart';
 import 'package:mensa_match/pages/home.dart';
+import 'package:mensa_match/pages/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -21,15 +22,15 @@ class MyApp extends StatelessWidget {
     print('TOP CHANGE Value changed to: $value!');
 
     return MaterialApp(
-        title: 'Mensa Match',
-        debugShowCheckedModeBanner: false,
-        home: value == AuthStatus.uninitialized
-            ? const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        )
-            : value == AuthStatus.authenticated
-            ? const Home()
-            : const LoginPage(),
-        );
+      title: 'Mensa Match',
+      debugShowCheckedModeBanner: false,
+      home: value == AuthStatus.uninitialized
+          ? const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            )
+          : value == AuthStatus.authenticated
+              ? const Home()
+              : const LoginPage(),
+    );
   }
 }
