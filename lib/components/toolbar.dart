@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mensa_match/pages/home.dart';
+import 'package:mensa_match/pages/tabs_page.dart';
 import 'package:mensa_match/pages/chat.dart';
 
 class MyIconToolbar extends StatefulWidget {
@@ -38,7 +38,7 @@ class _MyIconToolbarState extends State<MyIconToolbar> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => const Home()
+                builder: (context) => const TabsPage()
             )
         );
         break;
@@ -46,7 +46,7 @@ class _MyIconToolbarState extends State<MyIconToolbar> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ChatScreen()
+                builder: (context) => MessagesPage()
             )
         );
         break;
@@ -62,6 +62,3 @@ class _MyIconToolbarState extends State<MyIconToolbar> {
     });
   }
 }
-
-
-
