@@ -2,6 +2,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:mensa_match/appwrite/constants.dart';
+import 'package:flutter/widgets.dart';
 
 class DatabaseAPI {
   Client client = Client();
@@ -36,13 +37,19 @@ class DatabaseAPI {
         documentId: ID.unique(),
         data: {
           'text': message,
-          'date': DateTime.now().toString(),
+          'timestamp': DateTime.now().toString(),
           'user_id': auth.userid
         });
   }
 
   Future<dynamic> deleteMessage({required String id}) {
     return databases.deleteDocument(
+        databaseId: APPWRITE_DATABASE_ID,
+        collectionId: COLLECTION_MESSAGES,
+        documentId: id);
+  }
+  Future<dynamic> updateMessage({required String id}) {
+    return databases.updateDocument(
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_MESSAGES,
         documentId: id);
