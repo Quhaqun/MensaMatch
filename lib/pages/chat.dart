@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:appwrite/appwrite.dart';
 import 'package:mensa_match/components/chat_message.dart';
 import 'package:mensa_match/components/chat_bubble.dart';
-import 'toolbar.dart';
+import 'package:mensa_match/components/toolbar.dart';
 import '../components/chat_textfield.dart';
 
 const String projectID = "657c5f8ee668aff8af1f";

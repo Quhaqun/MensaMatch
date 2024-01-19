@@ -2,7 +2,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:mensa_match/components/button_primary.dart';
 import 'package:mensa_match/components/input_textfield.dart';
-import 'package:mensa_match/pages/register_page.dart';
+import 'package:mensa_match/pages/register.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';

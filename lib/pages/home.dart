@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:provider/provider.dart';
-import 'toolbar.dart';
+import 'package:mensa_match/components/toolbar.dart';
 
-class TabsPage extends StatefulWidget {
-  const TabsPage({Key? key}) : super(key: key);
+class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
 
   @override
-  _TabsPageState createState() => _TabsPageState();
+  _HomeState createState() => _HomeState();
 }
 
-class _TabsPageState extends State<TabsPage> {
+class _HomeState extends State<Home> {
   int _selectedIndex = 0;
 
   static const _widgets = "";

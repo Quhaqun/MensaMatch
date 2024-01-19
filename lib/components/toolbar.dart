@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mensa_match/pages/tabs_page.dart';
-import 'package:mensa_match/pages/chat_screen.dart';
+import 'package:mensa_match/pages/home.dart';
+import 'package:mensa_match/pages/chat.dart';
 
 class MyIconToolbar extends StatefulWidget {
   const MyIconToolbar({Key? key}) : super(key: key);
@@ -38,7 +38,7 @@ class _MyIconToolbarState extends State<MyIconToolbar> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => const TabsPage()
+                builder: (context) => const Home()
             )
         );
         break;
