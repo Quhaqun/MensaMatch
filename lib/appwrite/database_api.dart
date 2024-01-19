@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
@@ -27,6 +29,10 @@ class DatabaseAPI {
     return databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MESSAGES,
+      queries:
+      [
+        Query.equal("user_id", [auth.userid]),
+      ]
     );
   }
 
@@ -38,7 +44,8 @@ class DatabaseAPI {
         data: {
           'text': message,
           'timestamp': DateTime.now().toString(),
-          'user_id': auth.userid
+          'user_id': auth.userid,
+          'reciever_id': "65a15c814a8f1f1e2cbd",
         });
   }
 
