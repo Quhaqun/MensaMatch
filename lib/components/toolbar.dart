@@ -38,7 +38,7 @@ class _MyIconToolbarState extends State<MyIconToolbar> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => const TabsPage()
+                builder: (context) => const Home()
             )
         );
         break;
