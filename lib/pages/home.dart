@@ -3,6 +3,11 @@ import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:provider/provider.dart';
 import 'package:mensa_match/components/toolbar.dart';
 
+import 'package:mensa_match/constants/colors.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mensa_match/components/wave_background.dart';
+import 'package:mensa_match/components/page_header.dart';
+
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
@@ -29,14 +34,29 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Center(
-          child: TextButton(
-            onPressed: (){
-              signOut();
-            },
-            child: const Text("sign out"),
-          ),
-        ),
+      backgroundColor: AppColors.backgroundColorLight,
+      body: CustomPaint(
+          painter: WaveBackgroundPainterShort(baseHeight: 160),
+          child: Container(
+            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              PageHeader(
+                  title: 'Home',
+                  backButton: false,
+                  headerHeight: 150,
+                  onBackPressed: () {}),
+              const SizedBox(height: 40),
+              Text(
+                'Upcoming Lunch Meetings',
+                style: GoogleFonts.roboto(
+                  color: AppColors.textColorGray,
+                  fontWeight: FontWeight.w400,
+                  fontSize: 20,
+                ),
+              ),
+            ]),
+          )),
       bottomNavigationBar: MyIconToolbar(),
     );
   }

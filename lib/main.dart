@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
             )
           : value == AuthStatus.authenticated
               ? const Home()
-              : const LoginPage(),
+              : const Home(),
     );
   }
 }
