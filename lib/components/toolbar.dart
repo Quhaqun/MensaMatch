@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mensa_match/pages/home.dart';
-import 'package:mensa_match/pages/chat.dart';
+import 'package:mensa_match/pages/chat_overview.dart';
 
 import 'package:mensa_match/constants/colors.dart';
 import 'package:mensa_match/pages/meeting_planner.dart';
@@ -57,7 +57,7 @@ class _MyIconToolbarState extends State<MyIconToolbar> {
         break;
       case 1:
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => MessagesPage()));
+            context, MaterialPageRoute(builder: (context) => ChatOverview()));
         break;
       case 2:
         Navigator.push(
