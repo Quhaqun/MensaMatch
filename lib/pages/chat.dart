@@ -65,6 +65,10 @@ class _MessagesPageState extends State<MessagesPage> {
     }
   }
 
+  Future<bool> isSender(String id) async {
+    return database.isSender(id);
+  }
+
   showAlert({required String title, required String text}) {
     showDialog(
       context: context,
@@ -89,20 +93,38 @@ class _MessagesPageState extends State<MessagesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Messages'),
+        title: Row(
+          children: [
+            CircleAvatar(
+              backgroundImage: NetworkImage('https://example.com/placeholder_image.jpg'),
+            ),
+            const SizedBox(width: 8.0),
+            Text('Jonas'),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              loadMessages();
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
-              reverse: true, // Reverse the order to display messages from bottom to top
+              reverse: true,
               itemCount: messages?.length ?? 0,
               itemBuilder: (context, index) {
                 final reversedIndex = (messages!.length - 1) - index;
                 final message = messages![reversedIndex];
+
+                // ...
+
                 return GestureDetector(
                   onLongPress: () {
-                    // Show a confirmation dialog before deleting the message
                     showDialog(
                       context: context,
                       builder: (context) {
@@ -117,8 +139,11 @@ class _MessagesPageState extends State<MessagesPage> {
                               child: const Text('Cancel'),
                             ),
                             ElevatedButton(
-                              onPressed: () {
-                                deleteMessage(message.$id);
+                              onPressed: () async {
+                                bool isSenderValue = await isSender(message.$id);
+                                if (isSenderValue) {
+                                  deleteMessage(message.$id);
+                                }
                                 Navigator.pop(context);
                               },
                               child: const Text('Delete'),
@@ -130,17 +155,44 @@ class _MessagesPageState extends State<MessagesPage> {
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        // Your code to display chat bubbles
-                        Card(
-                          child: Padding(
+                    child: FutureBuilder<bool>(
+                      future: isSender(message.$id),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text("Error: ${snapshot.error}");
+                        } else {
+                          final isSender = snapshot.data!;
+
+                          return Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text(message.data['text']),
-                          ),
-                        ),
-                      ],
+                            child: Column(
+                              mainAxisAlignment: isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
+                              crossAxisAlignment: isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  constraints: BoxConstraints(
+                                    maxWidth: 200.0, // Set a maximum width for the chat bubble
+                                  ),
+                                  child: Card(
+                                    color: isSender ? Colors.blue : Colors.lightBlue,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        message.data['text'],
+                                        style: TextStyle(
+                                          color: isSender ? Colors.white : Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
                     ),
                   ),
                 );
