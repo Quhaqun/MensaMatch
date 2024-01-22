@@ -7,6 +7,9 @@ import 'package:mensa_match/constants/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mensa_match/components/wave_background.dart';
 import 'package:mensa_match/components/page_header.dart';
+import 'package:mensa_match/components/home_meeting_card.dart';
+import 'package:mensa_match/components/button_primary.dart';
+import 'package:mensa_match/pages/meeting_planner.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -55,6 +58,80 @@ class _HomeState extends State<Home> {
                   fontSize: 20,
                 ),
               ),
+              SizedBox(height: 12),
+              Container(
+                height: 120.0,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    HomeMeetingCard(
+                        imageUrl:
+                            'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
+                        name: 'Lara',
+                        time: '12:00 Uhr',
+                        location: 'Skyline Mensa'),
+                    HomeMeetingCard(
+                        imageUrl:
+                            'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
+                        name: 'Lara',
+                        time: '12:00 Uhr',
+                        location: 'Skyline Mensa'),
+                    HomeMeetingCard(
+                        imageUrl:
+                            'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
+                        name: 'Lara',
+                        time: '12:00 Uhr',
+                        location: 'Skyline Mensa')
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Past Lunch Meetings',
+                style: GoogleFonts.roboto(
+                  color: AppColors.textColorGray,
+                  fontWeight: FontWeight.w400,
+                  fontSize: 20,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                height: 120.0,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    HomeMeetingCard(
+                        imageUrl:
+                            'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
+                        name: 'Lara',
+                        time: '12:00 Uhr',
+                        location: 'Skyline Mensa'),
+                    HomeMeetingCard(
+                        imageUrl:
+                            'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
+                        name: 'Lara',
+                        time: '12:00 Uhr',
+                        location: 'Skyline Mensa'),
+                    HomeMeetingCard(
+                        imageUrl:
+                            'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
+                        name: 'Lara',
+                        time: '12:00 Uhr',
+                        location: 'Skyline Mensa')
+                  ],
+                ),
+              ),
+              const Spacer(),
+              const SizedBox(height: 10),
+              button_primary(
+                  buttonText: 'Plan new meeting',
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const MeetingPlanner()));
+                  }),
+              const SizedBox(height: 10),
             ]),
           )),
       bottomNavigationBar: MyIconToolbar(),
