@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:mensa_match/components/settings_entry.dart';
 import 'package:mensa_match/components/settings_social_entry.dart';
 
+import 'package:provider/provider.dart';
+import 'package:mensa_match/appwrite/auth_api.dart';
+
 class Settings extends StatelessWidget {
   const Settings({super.key});
 
@@ -12,9 +15,9 @@ class Settings extends StatelessWidget {
       appBar: AppBar(
         title: Text('Einstellungen'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(child: Padding(
         padding: EdgeInsets.all(16.0),
-        child: ListView(
+        child: Column(
           children: [
             SettingsBox(
               title: 'Account',
@@ -58,6 +61,15 @@ class Settings extends StatelessWidget {
                 // Aktion für Hilfeeinstellungen
               },
             ),
+            SettingsBox(
+              title: 'Sign Out',
+              icon: Icons.help,
+              onTap: () {
+                // Aktion für Hilfeeinstellungen
+                final AuthAPI appwrite = context.read<AuthAPI>();
+                appwrite.signOut();
+              },
+            ),
             SizedBox(height: 16),
             const Text(
               'Follow Us:',
@@ -81,6 +93,6 @@ class Settings extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 }
