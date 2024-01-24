@@ -86,11 +86,18 @@ class DatabaseAPI {
         documentId: id);
   }
 
-  Future<dynamic> updateMessage({required String id}) {
+  Future<dynamic> updateMessage({required String id, Map<String, dynamic>? updatedFields}) {
+    if (updatedFields == null || updatedFields.isEmpty) {
+      // If no fields are provided, return a Future.error
+      return Future.error('No fields provided for update');
+    }
+
     return databases.updateDocument(
-        databaseId: APPWRITE_DATABASE_ID,
-        collectionId: COLLECTION_MESSAGES,
-        documentId: id);
+      databaseId: APPWRITE_DATABASE_ID,
+      collectionId: COLLECTION_MESSAGES,
+      documentId: id,
+      data: updatedFields,
+    );
   }
 
   Future<bool> isSender(String id) async {
@@ -108,4 +115,23 @@ class DatabaseAPI {
       return false;
     }
   }
+
+
+  Future<Document> createUser() {
+    return databases.createDocument(
+        databaseId: APPWRITE_DATABASE_ID,
+        collectionId: COLLECTION_USERS,
+        documentId: ID.unique(),
+        data: {
+          'Name': auth.username,
+          'Studiengang': "",
+          'Email': auth.email,
+          'Alter': "",
+          'Semester': "",
+          'Biografie':"",
+          'Vorlieben':"",
+          'user_id': auth.userid
+        });
+  }
+
 }
