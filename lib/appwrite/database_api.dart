@@ -164,12 +164,12 @@ class DatabaseAPI {
   }
 
   Future<void> updateProfile({
-    required String name,
-    required String email,
-    required String bio,
-    required String course,
-    required int age,
-    required String preferences
+    String? name,
+    String? email,
+    String? bio,
+    String? course,
+    int? age,
+    String? preferences,
   }) async {
     try {
       print("2.2.1");
@@ -182,14 +182,53 @@ class DatabaseAPI {
           Query.equal("user_id", [auth.userid]),
         ],
       );
+
       var docId = filteredUser.documents.first.$id;
+
+      final existingUserProfile = await getUserProfile();
+
+      final Map<String, dynamic> updateData = {};
+
+      if (name != null && (existingUserProfile?.name != name)) {
+        updateData['name'] = name;
+      } else if (existingUserProfile?.name != null) {
+        updateData['name'] = existingUserProfile?.name;
+      }
+
+      if (email != null && (existingUserProfile?.email != email)) {
+        updateData['email'] = email;
+      } else if (existingUserProfile?.email != null) {
+        updateData['email'] = existingUserProfile?.email;
+      }
+
+      if (bio != null && (existingUserProfile?.bio != bio)) {
+        updateData['bio'] = bio;
+      } else if (existingUserProfile?.bio != null) {
+        updateData['bio'] = existingUserProfile?.bio;
+      }
+
+      if (course != null && (existingUserProfile?.course != course)) {
+        updateData['course'] = course;
+      } else if (existingUserProfile?.course != null) {
+        updateData['course'] = existingUserProfile?.course;
+      }
+
+      if (age != null && (existingUserProfile?.age != age)) {
+        updateData['age'] = age;
+      } else if (existingUserProfile?.age != null) {
+        updateData['age'] = existingUserProfile?.age;
+      }
+
+      if (preferences != null && (existingUserProfile?.preferences != preferences)) {
+        updateData['preferences'] = preferences;
+      } else if (existingUserProfile?.preferences != null) {
+        updateData['preferences'] = existingUserProfile?.preferences;
+      }
+
       await databases.updateDocument(
         collectionId: COLLECTION_USERS,
         documentId: docId,
-        data: {
-          'course': course
-          // Add other fields as needed
-        },
+        data: updateData,
         databaseId: APPWRITE_DATABASE_ID,
       );
     } catch (e) {

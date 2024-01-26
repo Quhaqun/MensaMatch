@@ -8,24 +8,24 @@ class UserProfile {
   final String preferences;
 
   UserProfile({
-    this.name,
-    this.course,
-    this.email,
-    this.age,
-    this.bio,
-    this.preferences,
     required this.user_id,
+    this.name = '',
+    this.course = '',
+    this.email = '',
+    this.age = 0,
+    this.bio = '',
+    this.preferences = '',
   });
 
   factory UserProfile.fromMap(Map<String, dynamic> map) {
     return UserProfile(
-      user_id: map['user_id'],
-      name: map['name'],
-      email: map['email'],
-      bio: map['bio'],
-      course: map['course'] ?? '', // Add this line to handle null values
-      age: map['age'] ?? 0, // Add this line to handle null values
-      preferences: map['preferences'] ?? '', // Add this line to handle null values
+      user_id: map['user_id'] ?? '',
+      name: map['name'] ?? '',
+      email: map['email'] ?? '',
+      bio: map['bio'] ?? '',
+      course: map['course'] ?? '',
+      age: map['age'] as int ?? 0,
+      preferences: map['preferences'] ?? '',
     );
   }
 
@@ -34,8 +34,8 @@ class UserProfile {
       'name': name,
       'email': email,
       'bio': bio,
-      'course': course, // Add this line to include course in the map
-      'age': age, // Add this line to include age in the map
+      'course': course,
+      'age': age,
       'preferences': preferences,
     };
   }
