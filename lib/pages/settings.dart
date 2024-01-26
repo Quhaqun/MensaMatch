@@ -7,6 +7,9 @@ import 'package:mensa_match/pages/login.dart';
 import 'package:provider/provider.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 
+import 'package:provider/provider.dart';
+import 'package:mensa_match/appwrite/auth_api.dart';
+
 class Settings extends StatelessWidget {
   const Settings({super.key});
 

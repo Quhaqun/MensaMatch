@@ -1,4 +1,4 @@
-import 'dart:ffi';
+
 import 'dart:html';
 
 import 'package:appwrite/appwrite.dart';
@@ -6,7 +6,7 @@ import 'package:appwrite/models.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:mensa_match/appwrite/constants.dart';
 import 'package:flutter/widgets.dart';
-
+import 'package:mensa_match/pages/user_profile.dart';
 
 class DatabaseAPI {
   Client client = Client();
@@ -87,11 +87,19 @@ class DatabaseAPI {
         documentId: id);
   }
 
-  Future<dynamic> updateMessage({required String id}) {
+  Future<dynamic> updateMessage(
+      {required String id, Map<String, dynamic>? updatedFields}) {
+    if (updatedFields == null || updatedFields.isEmpty) {
+      // If no fields are provided, return a Future.error
+      return Future.error('No fields provided for update');
+    }
+
     return databases.updateDocument(
-        databaseId: APPWRITE_DATABASE_ID,
-        collectionId: COLLECTION_MESSAGES,
-        documentId: id);
+      databaseId: APPWRITE_DATABASE_ID,
+      collectionId: COLLECTION_MESSAGES,
+      documentId: id,
+      data: updatedFields,
+    );
   }
 
   Future<bool> isSender(String id) async {
@@ -109,6 +117,144 @@ class DatabaseAPI {
       return false;
     }
   }
+
+
+  Future<bool> doesUserExist(String? userId) async {
+    try {
+      final response = await databases.listDocuments(
+        databaseId: APPWRITE_DATABASE_ID,
+        collectionId: COLLECTION_USERS,
+        queries: [
+          Query.equal('user_id', [userId]),
+        ],
+      );
+
+      // If the response contains any documents, the user already exists
+      return response.documents.isNotEmpty;
+    } catch (e) {
+      // Handle errors as needed
+      print('Error checking user existence: $e');
+      return false;
+    }
+  }
+
+  Future<Document> createUser() async {
+    // Check if user with the same user_id already exists
+    final userExists = await doesUserExist(auth.userid);
+    final documentId = await ID.unique();
+    if (!userExists) {
+      // If the user doesn't exist, create the user in the database
+      return databases.createDocument(
+        databaseId: APPWRITE_DATABASE_ID,
+        collectionId: COLLECTION_USERS,
+        documentId: documentId,
+        data: {
+          'name': auth.username,
+          'course': "",
+          'email': auth.email,
+          'age': 0,
+          'semester': 0,
+          'bio': "",
+          'preferences': "",
+          'user_id': auth.userid
+        },
+      );
+    } else {
+      // Handle the case where the user already exists
+      print('User with user_id already exists');
+      // You might want to return an error or handle it differently based on your requirements
+      throw Exception('User with user_id already exists');
+    }
+  }
+
+  Future<void> updateProfile({
+    required String name,
+    required String email,
+    required String bio,
+    required String course,
+    required int age,
+    required String preferences
+  }) async {
+    try {
+      print("2.2.1");
+      print(auth.userid);
+
+      final filteredUser = await databases.listDocuments(
+        databaseId: APPWRITE_DATABASE_ID,
+        collectionId: COLLECTION_USERS,
+        queries: [
+          Query.equal("user_id", [auth.userid]),
+        ],
+      );
+      var docId = filteredUser.documents.first.$id;
+      await databases.updateDocument(
+        collectionId: COLLECTION_USERS,
+        documentId: docId,
+        data: {
+          'course': course
+          // Add other fields as needed
+        },
+        databaseId: APPWRITE_DATABASE_ID,
+      );
+    } catch (e) {
+      // Handle update error
+      print('Error updating user profile: $e');
+      throw AppwriteException('document_not_found');
+    }
+  }
+
+
+  Future<UserProfile?> getUserProfile() async {
+    try {
+      print("1.1");
+      print(auth.userid);
+
+      if (auth.userid == null) {
+        print('User ID is null');
+        return null;
+      }
+
+      print("1.2");
+      final response = await databases.listDocuments(
+        databaseId: APPWRITE_DATABASE_ID,
+        collectionId: COLLECTION_USERS,
+        queries: [
+          Query.equal('user_id', [auth.userid!]),
+        ],
+      );
+
+      print("1.3");
+
+      if (response.documents.isNotEmpty) {
+        try {
+          final userDataMap = response.documents.first.data;
+          final userProfile = UserProfile(
+            name: userDataMap['name'],
+            course: userDataMap['course'],
+            email: userDataMap['email'],
+            age: userDataMap['age'] as int,
+            bio: userDataMap['bio'],
+            preferences: userDataMap['preferences'],
+            user_id: userDataMap['user_id']
+          );
+
+          print("User profile: $userProfile");
+          return userProfile;
+        } catch (e) {
+          print("Error creating UserProfile: $e");
+          return null;
+        }
+      } else {
+        // Handle the case when the document is not found
+        // For example, return an empty UserProfile or throw an exception
+        return null; // Replace this with your desired behavior
+      }
+    }
+    catch(e){
+      return null;
+    }
+  }
+}
 
   Future<Document> addMatch(
       {required String place, String major="", int semester = 0, required int starthour, required int startmin, required int endhour, required int endmin}) {

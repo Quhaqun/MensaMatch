@@ -75,7 +75,7 @@ class _HomeState extends State<Home> {
           child: Container(
             padding: const EdgeInsets.only(left: 16.0, right: 16.0),
             child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               PageHeader(
                   title: 'Home',
                   backButton: false,
@@ -124,19 +124,19 @@ class _HomeState extends State<Home> {
                   children: [
                     HomeMeetingCard(
                         imageUrl:
-                            'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
+                        'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
                         name: 'Lara',
                         time: '12:00 Uhr',
                         location: 'Skyline Mensa'),
                     HomeMeetingCard(
                         imageUrl:
-                            'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
+                        'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
                         name: 'Lara',
                         time: '12:00 Uhr',
                         location: 'Skyline Mensa'),
                     HomeMeetingCard(
                         imageUrl:
-                            'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
+                        'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
                         name: 'Lara',
                         time: '12:00 Uhr',
                         location: 'Skyline Mensa')

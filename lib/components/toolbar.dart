@@ -6,6 +6,7 @@ import 'package:mensa_match/constants/colors.dart';
 import 'package:mensa_match/pages/meeting_planner.dart';
 import 'package:mensa_match/pages/settings.dart';
 import 'package:mensa_match/pages/profile_view.dart';
+import 'package:mensa_match/pages/edit_profile.dart';
 
 class MyIconToolbar extends StatefulWidget {
   const MyIconToolbar({Key? key}) : super(key: key);
@@ -65,7 +66,7 @@ class _MyIconToolbarState extends State<MyIconToolbar> {
         break;
       case 3:
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Profile()));
+            context, MaterialPageRoute(builder: (context) => EditProfilePage()));//Profile()));
         break;
       case 4:
         Navigator.push(

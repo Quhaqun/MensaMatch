@@ -26,11 +26,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: value == AuthStatus.uninitialized
           ? const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            )
+        body: Center(child: CircularProgressIndicator()),
+      )
           : value == AuthStatus.authenticated
-              ? const Home()
-              : const LoginPage(),
+          ? const Home()
+          : const LoginPage(),
     );
   }
 }

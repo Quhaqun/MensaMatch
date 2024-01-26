@@ -123,7 +123,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     onPressed: () async {
                       final ImagePicker picker = ImagePicker();
                       final XFile? image =
-                          await picker.pickImage(source: ImageSource.gallery);
+                      await picker.pickImage(source: ImageSource.gallery);
                     },
                     child: Text('Pick an image'),
                   ),
