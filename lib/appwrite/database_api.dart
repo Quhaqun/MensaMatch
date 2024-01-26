@@ -1,4 +1,5 @@
-import 'dart:html';
+import 'dart:ffi';
+//import 'dart:html';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
@@ -11,7 +12,7 @@ class DatabaseAPI {
   Client client = Client();
   late final Account account;
   late final Databases databases;
-  final AuthAPI auth = AuthAPI();
+  AuthAPI auth = AuthAPI();
 
   DatabaseAPI() {
     init();
@@ -107,5 +108,86 @@ class DatabaseAPI {
       print("Error in isSender(): $e");
       return false;
     }
+  }
+
+  Future<Document> addMatch(
+      {required String place, String major="", int semester = 0, required int starthour, required int startmin, required int endhour, required int endmin}) {
+    return databases.createDocument(
+        databaseId: APPWRITE_DATABASE_ID,
+        collectionId: COLLECTION_MATCH,
+        documentId: ID.unique(),
+        data: {
+          'Name': auth.username,
+          'Place': place,
+          'Major': major,
+          'Semester': semester,
+          'Starthour': starthour,
+          'Startmin': startmin,
+          'Endhour': endhour,
+          'Endmin': endmin,
+          'user_id': auth.userid,
+        });
+  }
+
+  Future<DocumentList> getMatches() async {
+    final userMatches = await databases.listDocuments(
+      databaseId: APPWRITE_DATABASE_ID,
+      collectionId: COLLECTION_MATCH,
+      queries: [
+        Query.notEqual("user_id", [auth.userid]),
+        Query.equal("matcher_id", ["empty"])
+      ],
+    );
+
+    return userMatches;
+  }
+
+  Future<DocumentList> getFoundMatches() async{
+    auth = AuthAPI();
+    await auth.loadUser();
+    final userMatches = await databases.listDocuments(
+      databaseId: APPWRITE_DATABASE_ID,
+      collectionId: COLLECTION_MATCH,
+      queries: [
+        Query.equal("user_id", [auth.userid]),
+        Query.notEqual("matcher_id", ["empty"])
+      ],
+    );
+
+    final reciverMatches = await databases.listDocuments(
+      databaseId: APPWRITE_DATABASE_ID,
+      collectionId: COLLECTION_MATCH,
+      queries: [
+        Query.equal("matcher_id", [auth.userid])
+      ],
+    );
+
+    // Combine the results of both requests
+    final List<Document> combinedMatches = [
+      ...userMatches.documents,
+      ...reciverMatches.documents,
+    ];
+
+    // Create a DocumentList with the combined and sorted messages
+    final documentList = DocumentList(
+      documents: combinedMatches,
+      total: combinedMatches.length,
+    );
+
+    return documentList;
+  }
+
+
+  Future<dynamic> updateMatch({required String id, required int starthour, required int startmin}) {
+    return databases.updateDocument(
+        databaseId: APPWRITE_DATABASE_ID,
+        collectionId: COLLECTION_MATCH,
+        documentId: id,
+        data: {
+          'matcher_id': auth.userid,
+          'Starthour': starthour,
+          'Startmin': startmin,
+        }
+    );
   }
 }
