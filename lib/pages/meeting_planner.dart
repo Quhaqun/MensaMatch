@@ -203,7 +203,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
 
     });
 
-    if(matches!.isNotEmpty && matches != null){
+    if(bestfind != ""){
       connectMatch(bestfind, starthour_best, startmin_best);
       showCustomPopup('Match found', 'Your Match is now in the Homepage!');
     }else{

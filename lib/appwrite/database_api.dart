@@ -254,7 +254,6 @@ class DatabaseAPI {
       return null;
     }
   }
-}
 
   Future<Document> addMatch(
       {required String place, String major="", int semester = 0, required int starthour, required int startmin, required int endhour, required int endmin}) {

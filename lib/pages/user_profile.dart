@@ -8,12 +8,12 @@ class UserProfile {
   final String preferences;
 
   UserProfile({
-    this.name,
-    this.course,
-    this.email,
-    this.age,
-    this.bio,
-    this.preferences,
+    required this.name,
+    required this.course,
+    required this.email,
+    required this.age,
+    required this.bio,
+    required this.preferences,
     required this.user_id,
   });
 
