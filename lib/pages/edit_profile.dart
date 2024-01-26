@@ -1,67 +1,104 @@
 import 'package:flutter/material.dart';
-import 'package:mensa_match/appwrite/auth_api.dart'; // Stelle sicher, dass der richtige Pfad importiert wird
+import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:provider/provider.dart';
-
 import '../appwrite/database_api.dart';
+import 'package:mensa_match/pages/user_profile.dart';
 
 class EditProfilePage extends StatefulWidget {
+  const EditProfilePage({Key? key}) : super(key: key);
+
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
+  final DatabaseAPI database = DatabaseAPI();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
+  final TextEditingController _courseController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _preferencesController = TextEditingController();
+  AuthStatus authStatus = AuthStatus.uninitialized;
 
   @override
   void initState() {
     super.initState();
-    // Hier könntest du die aktuellen Benutzerdaten in die Controller setzen
-    _nameController.text = context.read<AuthAPI>().currentUser.name ?? '';
-    _emailController.text = context.read<AuthAPI>().currentUser.email ?? '';
-    //_bioController.text = context.read<AuthAPI>().currentUser.prefs?['bio'] ?? '';
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      final AuthAPI appwrite = context.read<AuthAPI>();
+      authStatus = appwrite.status;
+      appwrite.loadUser();
+      _loadUserProfile();
+    });
+  }
+
+  Future<void> _loadUserProfile() async {
+    try {
+      print("1");
+      final userProfile = await database.getUserProfile();
+      print("2");
+        setState(() {
+          _nameController.text = userProfile!.name;
+          _emailController.text = userProfile.email;
+          _bioController.text = userProfile.bio;
+          _courseController.text = userProfile.course;
+          _ageController.text = userProfile.age.toString();
+          _preferencesController.text = userProfile.preferences;
+        });
+    } catch (e) {
+      print('Error fetching user profile: $e $authStatus');
+      // Handle error as needed
+    }
+  }
+
+  Future<void> _updateUserProfile() async {
+    try {
+      if (authStatus == AuthStatus.authenticated) {
+        await _loadUserProfile(); // Ensure _currentUser is initialized
+
+        /*final updatedAge = int.tryParse(_ageController.text);
+
+        if (updatedAge == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Invalid age format: ${_ageController.text}'),
+            ),
+          );*/
+          return;
+        }
+
+        await database.updateProfile(
+          name: _nameController.text,
+          email: _emailController.text,
+          bio: _bioController.text,
+          course: _courseController.text,
+          age: 20,//updatedAge,
+          preferences: _preferencesController.text,
+        );
+
+        // After updating, reload the user profile
+        await _loadUserProfile();
+    }
+    catch (e) {
+      print('Error updating user profile: $e');
+      // Handle error as needed
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profil bearbeiten'),
+        title: Text('Edit Profile'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(labelText: 'Name'),
-            ),
-            //SizedBox(height: 16.0),
-            //TextField(
-            //  controller: _emailController,
-            //  decoration: InputDecoration(labelText: 'E-Mail'),
-            //),
-            SizedBox(height: 16.0),
-            TextField(
-              controller: _bioController,
-              maxLines: 3,
-              decoration: InputDecoration(labelText: 'Biografie'),
-            ),
-            SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: () async {
-                await context.read<AuthAPI>().updateProfile(
-                  new_name: _nameController.text,
-                  //new_email: _emailController.text,
-                  new_bio: _bioController.text
-                );
-                Navigator.pop(context); // Zurück zur vorherigen Seite
-              },
-              child: Text('Speichern'),
-            ),
-          ],
-        ),
+      body: Column(
+        children: [
+          // Your existing TextFields and UI components
+          ElevatedButton(
+            onPressed: _updateUserProfile,
+            child: Text('Save'),
+          ),
+        ],
       ),
     );
   }

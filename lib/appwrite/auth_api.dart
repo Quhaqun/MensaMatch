@@ -1,8 +1,5 @@
-import 'dart:js';
-
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
-import 'package:flutter/material.dart';
 import 'package:mensa_match/appwrite/constants.dart';
 import 'package:flutter/widgets.dart';
 
@@ -34,7 +31,6 @@ class AuthAPI extends ChangeNotifier {
   }
 
   // Initialize the Appwrite client
-  // Initialize the Appwrite client
   init() {
     client
         .setEndpoint(APPWRITE_URL)
@@ -43,10 +39,11 @@ class AuthAPI extends ChangeNotifier {
     account = Account(client);
   }
 
-  Future<void> loadUser() async {
+  loadUser() async {
     try {
-      _currentUser = await account.get(); // Ensure _currentUser is initialized
+      final user = await account.get();
       _status = AuthStatus.authenticated;
+      _currentUser = user;
     } catch (e) {
       _status = AuthStatus.unauthenticated;
     } finally {
@@ -65,26 +62,6 @@ class AuthAPI extends ChangeNotifier {
       return user;
     } finally {
       notifyListeners();
-    }
-  }
-
-  Future<Map<String, dynamic>> updateProfile({required String new_name, required String new_bio}) async {
-    try {
-      final updatedUser = await account.updateName(name: new_name);
-      // Update bio locally (no need to make an API call for bio)
-      final updatedBio = new_bio;
-
-      // Notify listeners immediately after the update
-      notifyListeners();
-
-      // Return a Map with updated user information
-      return {
-        'name': updatedUser.name,
-        'bio': updatedBio,
-      };
-    } catch (e) {
-      print('Error updating profile: $e');
-      rethrow;
     }
   }
 
