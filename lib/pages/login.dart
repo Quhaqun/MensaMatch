@@ -45,10 +45,7 @@ class _LoginPageState extends State<LoginPage> {
         email: emailTextController.text,
         password: passwordTextController.text,
       );
-      Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Home())
-      );
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
     } on AppwriteException catch (e) {
       Navigator.pop(context);
       showAlert(title: 'Login failed', text: e.message.toString());
@@ -84,65 +81,79 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColorLight,
-      body: CustomPaint(
-        painter: WaveBackgroundPainter(),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(32.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Center(
-                  child: Column(
-                    children: [
-                      Text(
-                        "[M]",
-                        style: TextStyle(fontSize: 78),
+        backgroundColor: AppColors.backgroundColorLight,
+        body: LayoutBuilder(builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                  minWidth: constraints.maxWidth,
+                  minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: CustomPaint(
+                  painter: WaveBackgroundPainter(),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Center(
+                            child: Column(
+                              children: [
+                                Text(
+                                  "[M]",
+                                  style: TextStyle(fontSize: 78),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'MensaMatch',
+                                  style: TextStyle(fontSize: 24),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Spacer(),
+                          // Email textfield
+                          input_textfield(
+                              controller: emailTextController,
+                              labelText: "Email"),
+                          // Password textfield
+                          input_textfield(
+                              controller: passwordTextController,
+                              labelText: "Password"),
+                          // Sign In button
+                          button_primary(
+                              buttonText: "Sign In", onPressed: signIn),
+                          // OR
+                          Center(
+                            child: Text(
+                              "or",
+                              style: GoogleFonts.roboto(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.textColorGray,
+                              ),
+                            ),
+                          ),
+                          // Register textfield
+                          button_primary(
+                              buttonText: "Register",
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const RegisterPage()));
+                              }),
+                        ],
                       ),
-                      SizedBox(height: 8),
-                      Text(
-                        'MensaMatch',
-                        style: TextStyle(fontSize: 24),
-                      ),
-                    ],
-                  ),
-                ),
-                const Spacer(),
-                // Email textfield
-                input_textfield(
-                    controller: emailTextController, labelText: "Email"),
-                // Password textfield
-                input_textfield(
-                    controller: passwordTextController, labelText: "Password"),
-                // Sign In button
-                button_primary(buttonText: "Sign In", onPressed: signIn),
-                // OR
-                Center(
-                  child: Text(
-                    "or",
-                    style: GoogleFonts.roboto(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.textColorGray,
                     ),
                   ),
                 ),
-                // Register textfield
-                button_primary(
-                    buttonText: "Register",
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const RegisterPage()));
-                    }),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
+        }));
   }
 }

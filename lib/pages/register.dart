@@ -76,7 +76,8 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: AppColors.backgroundColorLight,
-        body: CustomPaint(
+        body: SingleChildScrollView(
+            child: CustomPaint(
           painter: WaveBackgroundPainter(),
           child: Center(
             child: Padding(
@@ -123,7 +124,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     onPressed: () async {
                       final ImagePicker picker = ImagePicker();
                       final XFile? image =
-                      await picker.pickImage(source: ImageSource.gallery);
+                          await picker.pickImage(source: ImageSource.gallery);
                     },
                     child: Text('Pick an image'),
                   ),
@@ -146,6 +147,6 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
           ),
-        ));
+        )));
   }
 }
