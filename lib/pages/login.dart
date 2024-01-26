@@ -3,6 +3,7 @@ import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:mensa_match/components/button_primary.dart';
 import 'package:mensa_match/components/input_textfield.dart';
 import 'package:mensa_match/components/wave_background.dart';
+import 'package:mensa_match/pages/home.dart';
 import 'package:mensa_match/pages/register.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -44,7 +45,10 @@ class _LoginPageState extends State<LoginPage> {
         email: emailTextController.text,
         password: passwordTextController.text,
       );
-      Navigator.pop(context);
+      Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Home())
+      );
     } on AppwriteException catch (e) {
       Navigator.pop(context);
       showAlert(title: 'Login failed', text: e.message.toString());
