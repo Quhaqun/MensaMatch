@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'package:mensa_match/components/settings_entry.dart';
 import 'package:mensa_match/components/settings_social_entry.dart';
+import 'package:mensa_match/pages/login.dart';
+
+import 'package:provider/provider.dart';
+import 'package:mensa_match/appwrite/auth_api.dart';
 
 import 'package:provider/provider.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
@@ -68,6 +72,10 @@ class Settings extends StatelessWidget {
                 // Aktion für Hilfeeinstellungen
                 final AuthAPI appwrite = context.read<AuthAPI>();
                 appwrite.signOut();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage())
+                );
               },
             ),
             SizedBox(height: 16),
