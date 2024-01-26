@@ -37,14 +37,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
       print("1");
       final userProfile = await database.getUserProfile();
       print("2");
-        setState(() {
-          _nameController.text = userProfile!.name;
-          _emailController.text = userProfile.email;
-          _bioController.text = userProfile.bio;
-          _courseController.text = userProfile.course;
-          _ageController.text = userProfile.age.toString();
-          _preferencesController.text = userProfile.preferences;
-        });
+      print(userProfile?.user_id);
+      setState(() {
+        _nameController.text = userProfile!.name;
+        _emailController.text = userProfile.email;
+        _bioController.text = userProfile.bio;
+        _courseController.text = userProfile.course;
+        _ageController.text = userProfile.age.toString();
+        _preferencesController.text = userProfile.preferences;
+      });
     } catch (e) {
       print('Error fetching user profile: $e $authStatus');
       // Handle error as needed
@@ -53,33 +54,24 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Future<void> _updateUserProfile() async {
     try {
+      print("2.05");
       if (authStatus == AuthStatus.authenticated) {
-        await _loadUserProfile(); // Ensure _currentUser is initialized
-
-        /*final updatedAge = int.tryParse(_ageController.text);
-
-        if (updatedAge == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Invalid age format: ${_ageController.text}'),
-            ),
-          );*/
-          return;
-        }
-
+        print("2.1");
+        // Removed redundant _loadUserProfile()
+        print("2.2");
         await database.updateProfile(
           name: _nameController.text,
           email: _emailController.text,
           bio: _bioController.text,
           course: _courseController.text,
-          age: 20,//updatedAge,
-          preferences: _preferencesController.text,
+          age: int.parse(_ageController.text), // Parse age from text to int
+          preferences: _preferencesController.text
         );
-
-        // After updating, reload the user profile
+        print("2.3");
         await _loadUserProfile();
-    }
-    catch (e) {
+        print("2.4");
+      }
+    } catch (e) {
       print('Error updating user profile: $e');
       // Handle error as needed
     }
@@ -94,6 +86,30 @@ class _EditProfilePageState extends State<EditProfilePage> {
       body: Column(
         children: [
           // Your existing TextFields and UI components
+          TextField(
+            controller: _nameController,
+            decoration: InputDecoration(labelText: 'Name'),
+          ),
+          TextField(
+            controller: _emailController,
+            decoration: InputDecoration(labelText: 'Email'),
+          ),
+          TextField(
+            controller: _bioController,
+            decoration: InputDecoration(labelText: 'Bio'),
+          ),
+          TextField(
+            controller: _courseController,
+            decoration: InputDecoration(labelText: 'Course'),
+          ),
+          TextField(
+            controller: _ageController,
+            decoration: InputDecoration(labelText: 'Age'),
+          ),
+          TextField(
+            controller: _preferencesController,
+            decoration: InputDecoration(labelText: 'Preferences'),
+          ),
           ElevatedButton(
             onPressed: _updateUserProfile,
             child: Text('Save'),

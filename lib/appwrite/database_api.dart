@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
@@ -139,21 +137,19 @@ class DatabaseAPI {
   Future<Document> createUser() async {
     // Check if user with the same user_id already exists
     final userExists = await doesUserExist(auth.userid);
-
+    final documentId = await ID.unique();
     if (!userExists) {
       // If the user doesn't exist, create the user in the database
       return databases.createDocument(
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_USERS,
-        documentId: ID.unique(),
+        documentId: documentId,
         data: {
           'name': auth.username,
           'course': "",
           'email': auth.email,
           'age': 0,
-          // Assuming Age is an integer, you can change it accordingly
           'semester': 0,
-          // Assuming Semester is an integer, you can change it accordingly
           'bio': "",
           'preferences': "",
           'user_id': auth.userid
@@ -173,24 +169,25 @@ class DatabaseAPI {
     required String bio,
     required String course,
     required int age,
-    required String preferences,
+    required String preferences
   }) async {
     try {
-      // Ensure auth.userid is not null before proceeding
-      if (auth.userid == null) {
-        return; // Handle the case when userid is null
-      }
+      print("2.2.1");
+      print(auth.userid);
 
+      final filteredUser = await databases.listDocuments(
+        databaseId: APPWRITE_DATABASE_ID,
+        collectionId: COLLECTION_USERS,
+        queries: [
+          Query.equal("user_id", [auth.userid]),
+        ],
+      );
+      var docId = filteredUser.documents.first.$id;
       await databases.updateDocument(
         collectionId: COLLECTION_USERS,
-        documentId: auth.userid!,
+        documentId: docId,
         data: {
-          'name': name,
-          'email': email,
-          'bio': bio,
-          'course': course,
-          'age': age,
-          'preferences': preferences,
+          'course': course
           // Add other fields as needed
         },
         databaseId: APPWRITE_DATABASE_ID,
@@ -214,7 +211,6 @@ class DatabaseAPI {
       }
 
       print("1.2");
-
       final response = await databases.listDocuments(
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_USERS,
@@ -226,17 +222,31 @@ class DatabaseAPI {
       print("1.3");
 
       if (response.documents.isNotEmpty) {
-        final userData = response.documents.first.data;
-        print("User data: $userData");
-        return UserProfile.fromMap(userData);
+        try {
+          final userDataMap = response.documents.first.data;
+          final userProfile = UserProfile(
+            name: userDataMap['name'],
+            course: userDataMap['course'],
+            email: userDataMap['email'],
+            age: userDataMap['age'] as int,
+            bio: userDataMap['bio'],
+            preferences: userDataMap['preferences'],
+            user_id: userDataMap['user_id']
+          );
+
+          print("User profile: $userProfile");
+          return userProfile;
+        } catch (e) {
+          print("Error creating UserProfile: $e");
+          return null;
+        }
       } else {
-        print("User not found");
-        return null;
+        // Handle the case when the document is not found
+        // For example, return an empty UserProfile or throw an exception
+        return null; // Replace this with your desired behavior
       }
-    } catch (e) {
-      print(auth.userid);
-      print(auth.status);
-      print('Error fetching user profile: $e');
+    }
+    catch(e){
       return null;
     }
   }

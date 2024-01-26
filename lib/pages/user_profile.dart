@@ -1,5 +1,5 @@
 class UserProfile {
-  final String id;
+  final String user_id;
   final String name;
   final String course;
   final String email;
@@ -8,18 +8,18 @@ class UserProfile {
   final String preferences;
 
   UserProfile({
-    required this.id,
-    required this.name,
-    required this.course,
-    required this.email,
-    required this.age,
-    required this.bio,
-    required this.preferences,
+    this.name,
+    this.course,
+    this.email,
+    this.age,
+    this.bio,
+    this.preferences,
+    required this.user_id,
   });
 
   factory UserProfile.fromMap(Map<String, dynamic> map) {
     return UserProfile(
-      id: map['id'],
+      user_id: map['user_id'],
       name: map['name'],
       email: map['email'],
       bio: map['bio'],
