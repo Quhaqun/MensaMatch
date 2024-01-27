@@ -13,38 +13,43 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage> {
   final DatabaseAPI database = DatabaseAPI();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _bioController = TextEditingController();
-  final TextEditingController _courseController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _preferencesController = TextEditingController();
+  late final TextEditingController _nameController;
+  late final TextEditingController _emailController;
+  late final TextEditingController _bioController;
+  late final TextEditingController _courseController;
+  late final TextEditingController _ageController;
+  late final TextEditingController _preferencesController;
   AuthStatus authStatus = AuthStatus.uninitialized;
 
   @override
   void initState() {
     super.initState();
+    _nameController = TextEditingController();
+    _emailController = TextEditingController();
+    _bioController = TextEditingController();
+    _courseController = TextEditingController();
+    _ageController = TextEditingController();
+    _preferencesController = TextEditingController();
+
+    _loadUserProfile(); // Call _loadUserProfile here directly
+
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       final AuthAPI appwrite = context.read<AuthAPI>();
       authStatus = appwrite.status;
       appwrite.loadUser();
-      _loadUserProfile();
     });
   }
 
   Future<void> _loadUserProfile() async {
     try {
-      print("1");
       final userProfile = await database.getUserProfile();
-      print("2");
-      print(userProfile?.user_id);
       setState(() {
-        _nameController.text = userProfile!.name;
-        _emailController.text = userProfile.email;
-        _bioController.text = userProfile.bio;
-        _courseController.text = userProfile.course;
-        _ageController.text = userProfile.age.toString();
-        _preferencesController.text = userProfile.preferences;
+        _nameController.text = userProfile?.name ?? '';
+        _emailController.text = userProfile?.email ?? '';
+        _bioController.text = userProfile?.bio ?? '';
+        _courseController.text = userProfile?.course ?? '';
+        _ageController.text = userProfile?.age?.toString() ?? '';
+        _preferencesController.text = userProfile?.preferences ?? '';
       });
     } catch (e) {
       print('Error fetching user profile: $e $authStatus');
@@ -55,12 +60,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Future<void> _updateUserProfile() async {
     final userProfile = await database.getUserProfile();
     try {
-      print("2.05");
       if (authStatus == AuthStatus.authenticated) {
-        print("2.1");
-        // Removed redundant _loadUserProfile()
-        print("2.2");
-
         // Parse age from text to int, handle invalid input gracefully
         int? age;
         try {
@@ -87,8 +87,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
     } finally {
       // Move _loadUserProfile outside of the try-catch block to ensure it always gets called
       await _loadUserProfile();
-      print("2.4");
     }
+  }
+
+  Widget _buildEditableTextField(String label, TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(labelText: label),
+    );
   }
 
   @override
