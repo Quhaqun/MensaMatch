@@ -171,9 +171,7 @@ class DatabaseAPI {
     String? preferences,
   }) async {
     try {
-      print("2.2.1");
-      print(auth.userid);
-
+      final existingUserProfile = await getUserProfile();
       final filteredUser = await databases.listDocuments(
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_USERS,
@@ -184,92 +182,18 @@ class DatabaseAPI {
 
       var docId = filteredUser.documents.first.$id;
 
-      final existingUserProfile = await getUserProfile();
-
       final Map<String, dynamic> updateData = {};
 
-      if (existingUserProfile?.name != name) {
-
-        if (name != null && name.isNotEmpty) {
-          print("new name");
-          updateData['name'] = name;
-          print(name);
-        } else if (existingUserProfile?.name != null && existingUserProfile!.name.isNotEmpty) {
-          print("old name");
-          updateData['name'] = existingUserProfile?.name;
-          print(existingUserProfile?.name);
-        } else {
-          print("Both new and old name are empty or null");
-        }
-      }
-
-      if (existingUserProfile?.email != email) {
-
-        if (email != null && email.isNotEmpty) {
-          print("new email");
-          updateData['email'] = email;
-          print(email);
-        } else if (existingUserProfile?.email != null && existingUserProfile!.email.isNotEmpty) {
-          print("old email");
-          updateData['email'] = existingUserProfile?.email;
-          print(existingUserProfile?.email);
-        } else {
-          print("Both new and old email are empty or null");
-        }
-      }
-
-      if (existingUserProfile?.bio != bio) {
-        if (bio != null && bio.isNotEmpty) {
-          print("new bio");
-          updateData['bio'] = bio;
-          print(bio);
-        } else if (existingUserProfile?.bio != null && existingUserProfile!.bio.isNotEmpty) {
-          print("old bio");
-          updateData['bio'] = existingUserProfile?.bio;
-          print(existingUserProfile?.bio);
-        } else {
-          print("Both new and old bio are empty or null");
-        }
-      }
-
-      if (existingUserProfile?.course != course) {
-
-        if (course != null && course.isNotEmpty) {
-          print("new course");
-          updateData['course'] = course;
-    print(course);
-        } else if (existingUserProfile?.course != null && existingUserProfile!.course.isNotEmpty) {
-          print("old course");
-          print(existingUserProfile?.course);
-          updateData['course'] = existingUserProfile?.course;
-        } else {
-          print("Both new and old course are empty or null");
-        }
-      }
-
-      if (existingUserProfile?.preferences != preferences) {
-
-        if (preferences != null && preferences.isNotEmpty) {
-          print("new preferences");
-          updateData['preferences'] = preferences;
-          print(preferences);
-        } else if (existingUserProfile?.preferences != null && existingUserProfile!.preferences.isNotEmpty) {
-          print("old preferences");
-          print(existingUserProfile?.preferences);
-          updateData['preferences'] = existingUserProfile?.preferences;
-        } else {
-          print("Both new and old preferences are empty or null");
-        }
-      }
+      _updateField(updateData, 'name', name, existingUserProfile?.name);
+      _updateField(updateData, 'email', email, existingUserProfile?.email);
+      _updateField(updateData, 'bio', bio, existingUserProfile?.bio);
+      _updateField(updateData, 'course', course, existingUserProfile?.course);
+      _updateField(updateData, 'preferences', preferences, existingUserProfile?.preferences);
 
       if (existingUserProfile?.age != age) {
         updateData['age'] = age ?? existingUserProfile?.age;
-        print(age != null ? "new age" : "old age");
-        print(age ?? existingUserProfile?.age);
       }
 
-
-      print(updateData);
       await databases.updateDocument(
         collectionId: COLLECTION_USERS,
         documentId: docId,
@@ -283,18 +207,21 @@ class DatabaseAPI {
     }
   }
 
+  void _updateField(Map<String, dynamic> updateData, String fieldName, String? newValue, String? oldValue) {
+    if (newValue != null && newValue.isNotEmpty) {
+      updateData[fieldName] = newValue;
+    } else if (oldValue != null && oldValue.isNotEmpty) {
+      updateData[fieldName] = oldValue;
+    }
+  }
+
 
   Future<UserProfile?> getUserProfile() async {
     try {
-      print("1.1");
-      print(auth.userid);
-
       if (auth.userid == null) {
         print('User ID is null');
         return null;
       }
-
-      print("1.2");
       final response = await databases.listDocuments(
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_USERS,
@@ -302,9 +229,6 @@ class DatabaseAPI {
           Query.equal('user_id', [auth.userid!]),
         ],
       );
-
-      print("1.3");
-
       if (response.documents.isNotEmpty) {
         try {
           final userDataMap = response.documents.first.data;
@@ -317,8 +241,6 @@ class DatabaseAPI {
               preferences: userDataMap['preferences'],
               user_id: userDataMap['user_id']
           );
-
-          print("User profile: $userProfile");
           return userProfile;
         } catch (e) {
           print("Error creating UserProfile: $e");
