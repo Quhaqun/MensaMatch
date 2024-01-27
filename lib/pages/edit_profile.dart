@@ -53,12 +53,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _updateUserProfile() async {
+    final userProfile = await database.getUserProfile();
     try {
       print("2.05");
       if (authStatus == AuthStatus.authenticated) {
         print("2.1");
         // Removed redundant _loadUserProfile()
         print("2.2");
+
+        // Parse age from text to int, handle invalid input gracefully
+        int? age;
+        try {
+          age = _ageController.text.isNotEmpty ? int.parse(_ageController.text) : null;
+        } catch (e) {
+          print('Invalid age format');
+          // Handle the error or provide a default value for age
+          // For example, you can set age to a default value like 0
+          age = userProfile?.age;
+        }
+
         await database.updateProfile(
             name: _nameController.text,
             email: _emailController.text,
@@ -67,12 +80,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
             age: int.parse(_ageController.text), // Parse age from text to int
             preferences: _preferencesController.text);
         print("2.3");
-        await _loadUserProfile();
-        print("2.4");
       }
     } catch (e) {
       print('Error updating user profile: $e');
       // Handle error as needed
+    } finally {
+      // Move _loadUserProfile outside of the try-catch block to ensure it always gets called
+      await _loadUserProfile();
+      print("2.4");
     }
   }
 

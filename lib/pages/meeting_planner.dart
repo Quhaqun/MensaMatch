@@ -4,6 +4,7 @@ import 'package:mensa_match/constants/colors.dart';
 import 'package:mensa_match/components/wave_background.dart';
 import 'package:mensa_match/components/toolbar.dart';
 import 'package:mensa_match/components/page_header.dart';
+
 import 'package:appwrite/appwrite.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:mensa_match/appwrite/database_api.dart';
@@ -251,6 +252,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
       print("Error in connectMatch(): $e");
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

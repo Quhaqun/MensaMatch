@@ -1,15 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:mensa_match/appwrite/auth_api.dart';
-import 'package:provider/provider.dart';
-import 'package:mensa_match/components/toolbar.dart';
 
-import 'package:mensa_match/constants/colors.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:mensa_match/components/wave_background.dart';
-import 'package:mensa_match/components/page_header.dart';
-import 'package:mensa_match/components/home_meeting_card.dart';
-import 'package:mensa_match/components/button_primary.dart';
-import 'package:mensa_match/pages/meeting_planner.dart';
+
 import 'package:mensa_match/appwrite/database_api.dart';
 import 'package:appwrite/models.dart';
 import 'package:flutter/services.dart';
@@ -29,10 +19,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int _selectedIndex = 0;
 
-  late List<Document>? matches = [];
-  final database = DatabaseAPI();
-  AuthStatus authStatus = AuthStatus.uninitialized;
-
   static const _widgets = "";
 
   void _onItemTapped(int index) {
@@ -41,28 +27,9 @@ class _HomeState extends State<Home> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    final AuthAPI appwrite = context.read<AuthAPI>();
-    authStatus = appwrite.status;
-    loadFoundMatches();
-  }
-
   signOut() {
     final AuthAPI appwrite = context.read<AuthAPI>();
     appwrite.signOut();
-  }
-
-  loadFoundMatches() async {
-    try {
-      final value = await database.getFoundMatches();
-      setState(() {
-        matches = value.documents;
-      });
-    } catch (e) {
-      print("Error in loadFoundMatches(): $e");
-    }
   }
 
   @override
