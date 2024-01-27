@@ -188,42 +188,88 @@ class DatabaseAPI {
 
       final Map<String, dynamic> updateData = {};
 
-      if (name != null && (existingUserProfile?.name != name)) {
-        updateData['name'] = name;
-      } else if (existingUserProfile?.name != null) {
-        updateData['name'] = existingUserProfile?.name;
+      if (existingUserProfile?.name != name) {
+
+        if (name != null && name.isNotEmpty) {
+          print("new name");
+          updateData['name'] = name;
+          print(name);
+        } else if (existingUserProfile?.name != null && existingUserProfile!.name.isNotEmpty) {
+          print("old name");
+          updateData['name'] = existingUserProfile?.name;
+          print(existingUserProfile?.name);
+        } else {
+          print("Both new and old name are empty or null");
+        }
       }
 
-      if (email != null && (existingUserProfile?.email != email)) {
-        updateData['email'] = email;
-      } else if (existingUserProfile?.email != null) {
-        updateData['email'] = existingUserProfile?.email;
+      if (existingUserProfile?.email != email) {
+
+        if (email != null && email.isNotEmpty) {
+          print("new email");
+          updateData['email'] = email;
+          print(email);
+        } else if (existingUserProfile?.email != null && existingUserProfile!.email.isNotEmpty) {
+          print("old email");
+          updateData['email'] = existingUserProfile?.email;
+          print(existingUserProfile?.email);
+        } else {
+          print("Both new and old email are empty or null");
+        }
       }
 
-      if (bio != null && (existingUserProfile?.bio != bio)) {
-        updateData['bio'] = bio;
-      } else if (existingUserProfile?.bio != null) {
-        updateData['bio'] = existingUserProfile?.bio;
+      if (existingUserProfile?.bio != bio) {
+        if (bio != null && bio.isNotEmpty) {
+          print("new bio");
+          updateData['bio'] = bio;
+          print(bio);
+        } else if (existingUserProfile?.bio != null && existingUserProfile!.bio.isNotEmpty) {
+          print("old bio");
+          updateData['bio'] = existingUserProfile?.bio;
+          print(existingUserProfile?.bio);
+        } else {
+          print("Both new and old bio are empty or null");
+        }
       }
 
-      if (course != null && (existingUserProfile?.course != course)) {
-        updateData['course'] = course;
-      } else if (existingUserProfile?.course != null) {
-        updateData['course'] = existingUserProfile?.course;
+      if (existingUserProfile?.course != course) {
+
+        if (course != null && course.isNotEmpty) {
+          print("new course");
+          updateData['course'] = course;
+    print(course);
+        } else if (existingUserProfile?.course != null && existingUserProfile!.course.isNotEmpty) {
+          print("old course");
+          print(existingUserProfile?.course);
+          updateData['course'] = existingUserProfile?.course;
+        } else {
+          print("Both new and old course are empty or null");
+        }
       }
 
-      if (age != null && (existingUserProfile?.age != age)) {
-        updateData['age'] = age;
-      } else if (existingUserProfile?.age != null) {
-        updateData['age'] = existingUserProfile?.age;
+      if (existingUserProfile?.preferences != preferences) {
+
+        if (preferences != null && preferences.isNotEmpty) {
+          print("new preferences");
+          updateData['preferences'] = preferences;
+          print(preferences);
+        } else if (existingUserProfile?.preferences != null && existingUserProfile!.preferences.isNotEmpty) {
+          print("old preferences");
+          print(existingUserProfile?.preferences);
+          updateData['preferences'] = existingUserProfile?.preferences;
+        } else {
+          print("Both new and old preferences are empty or null");
+        }
       }
 
-      if (preferences != null && (existingUserProfile?.preferences != preferences)) {
-        updateData['preferences'] = preferences;
-      } else if (existingUserProfile?.preferences != null) {
-        updateData['preferences'] = existingUserProfile?.preferences;
+      if (existingUserProfile?.age != age) {
+        updateData['age'] = age ?? existingUserProfile?.age;
+        print(age != null ? "new age" : "old age");
+        print(age ?? existingUserProfile?.age);
       }
 
+
+      print(updateData);
       await databases.updateDocument(
         collectionId: COLLECTION_USERS,
         documentId: docId,
