@@ -90,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
                   minHeight: constraints.maxHeight),
               child: IntrinsicHeight(
                 child: CustomPaint(
-                  painter: WaveBackgroundPainter(),
+                  painter: WaveBackgroundPainterShort(baseHeight: 350),
                   child: Center(
                     child: Padding(
                       padding: const EdgeInsets.all(32.0),
@@ -98,17 +98,39 @@ class _LoginPageState extends State<LoginPage> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Center(
+                          Center(
                             child: Column(
                               children: [
-                                Text(
-                                  "[M]",
-                                  style: TextStyle(fontSize: 78),
+                                Container(
+                                  child: Text(
+                                    '[M]',
+                                    style: GoogleFonts.roboto(
+                                      color: AppColors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 74,
+                                    ),
+                                  ),
                                 ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'MensaMatch',
-                                  style: TextStyle(fontSize: 24),
+                                Container(
+                                  child: Text(
+                                    'Welcome to',
+                                    style: GoogleFonts.roboto(
+                                      color: AppColors.white,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 48,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  child: Text(
+                                    '[MensaMatch]',
+                                    style: GoogleFonts.roboto(
+                                      color: AppColors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 48,
+                                      height: 1.0,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
