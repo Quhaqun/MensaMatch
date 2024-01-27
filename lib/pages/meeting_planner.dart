@@ -4,7 +4,6 @@ import 'package:mensa_match/constants/colors.dart';
 import 'package:mensa_match/components/wave_background.dart';
 import 'package:mensa_match/components/toolbar.dart';
 import 'package:mensa_match/components/page_header.dart';
-
 import 'package:appwrite/appwrite.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:mensa_match/appwrite/database_api.dart';
@@ -253,7 +252,6 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -288,8 +286,8 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
                                         buttonText: getDateButtonText(date),
                                         onPressed: () async {
                                           DateTime? selectedDateTime =
-                                              await showDatePickerDialog(
-                                                  context);
+                                          await showDatePickerDialog(
+                                              context);
                                           if (selectedDateTime != null) {
                                             setState(() {
                                               date = selectedDateTime;
@@ -305,13 +303,13 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
                                       margin: EdgeInsets.only(right: 8.0),
                                       child: BubbleElement(
                                         buttonText: starthour == 0 &&
-                                                startmin == 0
+                                            startmin == 0
                                             ? 'Start'
                                             : '${formatTime(starthour)}:${formatTime(startmin)}',
                                         onPressed: () async {
                                           TimeOfDay? selectedStartTime =
-                                              await showTimePickerDialog(
-                                                  context);
+                                          await showTimePickerDialog(
+                                              context);
                                           if (selectedStartTime != null) {
                                             setState(() {
                                               starthour =
@@ -340,8 +338,8 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
                                             : '${formatTime(endhour)}:${formatTime(endmin)}',
                                         onPressed: () async {
                                           TimeOfDay? selectedStartTime =
-                                              await showTimePickerDialog(
-                                                  context);
+                                          await showTimePickerDialog(
+                                              context);
                                           if (selectedStartTime != null) {
                                             setState(() {
                                               endhour = selectedStartTime.hour;
