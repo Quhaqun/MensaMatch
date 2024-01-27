@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:mensa_match/constants/colors.dart';
-import 'package:google_fonts/google_fonts.dart'; 
+import 'package:google_fonts/google_fonts.dart';
 
 class button_primary extends StatelessWidget {
   final String buttonText;
@@ -14,25 +14,32 @@ class button_primary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-        child: ElevatedButton(
-          onPressed: () {
-            onPressed();
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.accentColor1,
-            shape: RoundedRectangleBorder(
+      margin: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+      child: ElevatedButton(
+        onPressed: () {
+          onPressed();
+        },
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all(AppColors.accentColor1),
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),
             ),
-            minimumSize: const Size(double.infinity, 64.0),
           ),
-          child: Text(
-            buttonText,
-            style: GoogleFonts.roboto(
-              color: AppColors.white,
-              fontWeight: FontWeight.w400,
-              fontSize: 18,),
+          minimumSize: MaterialStateProperty.all(const Size(double.infinity, 64.0)),
+          overlayColor: MaterialStateProperty.all(Colors.transparent),
+          elevation: MaterialStateProperty.all(0.0),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        child: Text(
+          buttonText,
+          style: GoogleFonts.roboto(
+            color: AppColors.white,
+            fontWeight: FontWeight.w400,
+            fontSize: 18,
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

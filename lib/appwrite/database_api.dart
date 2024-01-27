@@ -1,14 +1,22 @@
+
+import 'dart:ffi' if (dart.library.html) 'dart:html' as html;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:mensa_match/appwrite/constants.dart';
 import 'package:mensa_match/pages/user_profile.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:convert';
+
 
 class DatabaseAPI {
   Client client = Client();
   late final Account account;
   late final Databases databases;
-  final AuthAPI auth = AuthAPI();
+
+  AuthAPI auth = AuthAPI();
+  late final Storage storage;
 
   DatabaseAPI() {
     init();
@@ -21,6 +29,7 @@ class DatabaseAPI {
         .setSelfSigned();
     account = Account(client);
     databases = Databases(client);
+    storage = new Storage(client);
   }
 
   Future<DocumentList> getMessages() async {
@@ -114,13 +123,14 @@ class DatabaseAPI {
     }
   }
 
-  Future<bool> doesUserExist(String? userId) async {
+
+  Future<bool> doesUserExist(String? email) async {
     try {
       final response = await databases.listDocuments(
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_USERS,
         queries: [
-          Query.equal('user_id', [userId]),
+          Query.equal('email', [email]),
         ],
       );
 
@@ -133,20 +143,22 @@ class DatabaseAPI {
     }
   }
 
-  Future<Document> createUser() async {
+  Future<Document> createUser(String name, String email, String course) async {
     // Check if user with the same user_id already exists
-    final userExists = await doesUserExist(auth.userid);
+    final userExists = await doesUserExist(email);
     final documentId = await ID.unique();
+    auth = AuthAPI();
+    await auth.loadUser();
     if (!userExists) {
       // If the user doesn't exist, create the user in the database
-      return databases.createDocument(
+      return await databases.createDocument(
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_USERS,
         documentId: documentId,
         data: {
-          'name': auth.username,
-          'course': "",
-          'email': auth.email,
+          'name': name,
+          'course': course,
+          'email': email,
           'age': 0,
           'semester': 0,
           'bio': "",
@@ -156,7 +168,7 @@ class DatabaseAPI {
       );
     } else {
       // Handle the case where the user already exists
-      print('User with user_id already exists');
+      print('User with email already exists');
       // You might want to return an error or handle it differently based on your requirements
       throw Exception('User with user_id already exists');
     }
@@ -254,6 +266,113 @@ class DatabaseAPI {
     }
     catch(e){
       return null;
+    }
+  }
+
+  Future<Document> addMatch(
+      {required String place, String major="", int semester = 0, required int starthour, required int startmin, required int endhour, required int endmin}) {
+    return databases.createDocument(
+        databaseId: APPWRITE_DATABASE_ID,
+        collectionId: COLLECTION_MATCH,
+        documentId: ID.unique(),
+        data: {
+          'Name': auth.username,
+          'Place': place,
+          'Major': major,
+          'Semester': semester,
+          'Starthour': starthour,
+          'Startmin': startmin,
+          'Endhour': endhour,
+          'Endmin': endmin,
+          'user_id': auth.userid,
+        });
+  }
+
+  Future<DocumentList> getMatches() async {
+    final userMatches = await databases.listDocuments(
+      databaseId: APPWRITE_DATABASE_ID,
+      collectionId: COLLECTION_MATCH,
+      queries: [
+        Query.notEqual("user_id", [auth.userid]),
+        Query.equal("matcher_id", ["empty"])
+      ],
+    );
+
+    return userMatches;
+  }
+
+  Future<DocumentList> getFoundMatches() async{
+    auth = AuthAPI();
+    await auth.loadUser();
+    final userMatches = await databases.listDocuments(
+      databaseId: APPWRITE_DATABASE_ID,
+      collectionId: COLLECTION_MATCH,
+      queries: [
+        Query.equal("user_id", [auth.userid]),
+        Query.notEqual("matcher_id", ["empty"])
+      ],
+    );
+
+    final reciverMatches = await databases.listDocuments(
+      databaseId: APPWRITE_DATABASE_ID,
+      collectionId: COLLECTION_MATCH,
+      queries: [
+        Query.equal("matcher_id", [auth.userid])
+      ],
+    );
+
+    // Combine the results of both requests
+    final List<Document> combinedMatches = [
+      ...userMatches.documents,
+      ...reciverMatches.documents,
+    ];
+
+    // Create a DocumentList with the combined and sorted messages
+    final documentList = DocumentList(
+      documents: combinedMatches,
+      total: combinedMatches.length,
+    );
+
+    return documentList;
+  }
+
+
+  Future<dynamic> updateMatch({required String id, required int starthour, required int startmin}) {
+    return databases.updateDocument(
+        databaseId: APPWRITE_DATABASE_ID,
+        collectionId: COLLECTION_MATCH,
+        documentId: id,
+        data: {
+          'matcher_id': auth.userid,
+          'Starthour': starthour,
+          'Startmin': startmin,
+        }
+    );
+  }
+
+  saveimage({required XFile image}) async{
+    String fileid = await auth.userid as String;
+    if(kIsWeb){
+      List<int> imageForWeb = await image.readAsBytes();
+      if(image.path !=null && image.name!=null && fileid!=null){
+        return storage.createFile(
+            bucketId: COLLECTION_Images,
+            fileId:  fileid,
+            file: InputFile.fromBytes(bytes: imageForWeb, filename: image.name)
+        );
+      }else{
+        print("path, imageName or userid was null");
+      }
+    }else{
+      if(image.path !=null && image.name!=null && fileid!=null){
+        return storage.createFile(
+          bucketId: COLLECTION_Images,
+          fileId:  fileid,
+          file: InputFile.fromPath(path: image.path, filename: image.name)
+        );
+      }else{
+        print("path, imageName or userid was null");
+      }
     }
   }
 }
