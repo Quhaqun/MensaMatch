@@ -11,6 +11,10 @@ import 'package:appwrite/models.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:mensa_match/components/popup_match.dart';
+import 'package:mensa_match/components/time_picker.dart';
+import 'package:mensa_match/components/bubble.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mensa_match/components/input_textfield.dart';
 
 class MeetingPlanner extends StatefulWidget {
   const MeetingPlanner({Key? key}) : super(key: key);
@@ -24,11 +28,12 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
   TextEditingController place = TextEditingController();
   TextEditingController major = TextEditingController();
   TextEditingController semester = TextEditingController();
+  DateTime date = DateTime.now();
   int starthour = 0;
   int startmin = 0;
   int endhour = 0;
   int endmin = 0;
-  int _flag = 0;
+  List<String> selectedOptions = [];
   AuthStatus authStatus = AuthStatus.uninitialized;
   late List<Document>? matches = [];
 
@@ -108,22 +113,16 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
       major.clear();
       semester.clear();
       setState(() {
+        date = DateTime.now();
         starthour = 0;
         startmin = 0;
         endhour = 0;
         endmin = 0;
-        _flag = 0;
+        selectedOptions = [];
       });
     } on AppwriteException catch (e) {
       showAlert(title: 'Error', text: e.message.toString());
     }
-  }
-
-  bool flag(int num) {
-    if (_flag == num) {
-      return false;
-    }
-    return true;
   }
 
   showAlert({required String title, required String text}) {
@@ -241,11 +240,12 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
       major.clear();
       semester.clear();
       setState(() {
+        date = DateTime.now();
         starthour = 0;
         startmin = 0;
         endhour = 0;
         endmin = 0;
-        _flag = 0;
+        selectedOptions = [];
       });
     } catch (e) {
       print("Error in connectMatch(): $e");
@@ -276,261 +276,150 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
                             headerHeight: 150,
                             onBackPressed: () {}),
                         const SizedBox(height: 40),
-                        Text(
-                          'Select Time Frame:',
-                          style:
-                              TextStyle(fontSize: 17, color: Color(0XFF6D7F94)),
-                        ),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Hour Dropdown 1
-                            DropdownButton<int>(
-                              value: starthour,
-                              onChanged: (int? newValue) {
-                                // Handle Hour Dropdown 1 change
-                                setState(() {
-                                  starthour = newValue!;
-                                });
-                              },
-                              items: List.generate(25, (index) {
-                                return DropdownMenuItem<int>(
-                                  value: index,
-                                  child: Text('$index'),
-                                );
-                              }),
-                            ),
-
-                            // Minute Dropdown 1
-                            DropdownButton<int>(
-                              value: startmin,
-                              onChanged: (int? newValue) {
-                                // Handle Minute Dropdown 1 change
-                                setState(() {
-                                  startmin = newValue!;
-                                });
-                              },
-                              items: List.generate(61, (index) {
-                                return DropdownMenuItem<int>(
-                                  value: index,
-                                  child: Text('$index'),
-                                );
-                              }),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 16),
-                        Container(
-                          child: Text(
-                            '-',
-                            style: TextStyle(fontSize: 35),
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Hour Dropdown 2
-                            DropdownButton<int>(
-                              value: endhour,
-                              onChanged: (int? newValue) {
-                                // Handle Hour Dropdown 2 change
-                                setState(() {
-                                  endhour = newValue!;
-                                });
-                              },
-                              items: List.generate(25, (index) {
-                                return DropdownMenuItem<int>(
-                                  value: index,
-                                  child: Text('$index'),
-                                );
-                              }),
-                            ),
-
-                            // Minute Dropdown 2
-                            DropdownButton<int>(
-                              value: endmin,
-                              onChanged: (int? newValue) {
-                                // Handle Minute Dropdown 2 change
-                                setState(() {
-                                  endmin = newValue!;
-                                });
-                              },
-                              items: List.generate(61, (index) {
-                                return DropdownMenuItem<int>(
-                                  value: index,
-                                  child: Text('$index'),
-                                );
-                              }),
-                            ),
-                          ],
-                        ),
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                  child: Container(
+                                      margin: EdgeInsets.only(right: 8.0),
+                                      child: BubbleElement(
+                                        buttonText: getDateButtonText(date),
+                                        onPressed: () async {
+                                          DateTime? selectedDateTime =
+                                              await showDatePickerDialog(
+                                                  context);
+                                          if (selectedDateTime != null) {
+                                            setState(() {
+                                              date = selectedDateTime;
+                                            });
+                                          } else {
+                                            print('User canceled the picker');
+                                          }
+                                        },
+                                        isSelected: false,
+                                      ))),
+                              Expanded(
+                                  child: Container(
+                                      margin: EdgeInsets.only(right: 8.0),
+                                      child: BubbleElement(
+                                        buttonText: starthour == 0 &&
+                                                startmin == 0
+                                            ? 'Start'
+                                            : '${formatTime(starthour)}:${formatTime(startmin)}',
+                                        onPressed: () async {
+                                          TimeOfDay? selectedStartTime =
+                                              await showTimePickerDialog(
+                                                  context);
+                                          if (selectedStartTime != null) {
+                                            setState(() {
+                                              starthour =
+                                                  selectedStartTime.hour;
+                                              startmin =
+                                                  selectedStartTime.minute;
+                                            });
+                                          } else {
+                                            print('User canceled the picker');
+                                          }
+                                        },
+                                        isSelected: false,
+                                      ))),
+                              Container(
+                                width: 10,
+                                height: 2,
+                                color: AppColors.textColorGray,
+                                margin: const EdgeInsets.only(bottom: 10.0),
+                              ),
+                              Expanded(
+                                  child: Container(
+                                      margin: EdgeInsets.only(left: 8.0),
+                                      child: BubbleElement(
+                                        buttonText: endhour == 0 && endmin == 0
+                                            ? 'End'
+                                            : '${formatTime(endhour)}:${formatTime(endmin)}',
+                                        onPressed: () async {
+                                          TimeOfDay? selectedStartTime =
+                                              await showTimePickerDialog(
+                                                  context);
+                                          if (selectedStartTime != null) {
+                                            setState(() {
+                                              endhour = selectedStartTime.hour;
+                                              endmin = selectedStartTime.minute;
+                                            });
+                                          } else {
+                                            print('User canceled the picker');
+                                          }
+                                        },
+                                        isSelected: false,
+                                      ))),
+                            ]),
                         // Subtitle
+                        SizedBox(height: 16),
                         Container(
                           child: Text(
-                            'Mensa selection',
-                            style: TextStyle(
-                                fontSize: 17, color: Color(0xFF6D7F94)),
+                            'Mensa Selection',
+                            style: GoogleFonts.roboto(
+                              color: AppColors.textColorGray,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 20,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 16),
-                        // First Row of ElevatedButtons
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                // Handle Button Press
-
-                                setState(() => _flag = 1);
-                                place.text = "Hardenbergstraße";
-                                print('Hardenbergstraße pressed');
-                              },
-                              child: Text('Hardenbergstraße'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    flag(1) ? null : Colors.greenAccent,
-                              ),
-                            ),
-                            SizedBox(width: 16),
-                            ElevatedButton(
-                              onPressed: () {
-                                // Handle Button Press
-                                setState(() => _flag = 2);
-                                place.text = "Pastaria";
-                                print('Pastaria pressed');
-                              },
-                              child: Text('Pastaria'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    flag(2) ? null : Colors.greenAccent,
-                              ),
-                            ),
-                            SizedBox(width: 16),
-                            ElevatedButton(
-                              onPressed: () {
-                                // Handle Button Press
-                                setState(() => _flag = 3);
-                                place.text = "MAR";
-                                print('MAR pressed');
-                              },
-                              child: Text('MAR'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    flag(3) ? null : Colors.greenAccent,
-                              ),
-                            ),
-                          ],
                         ),
                         SizedBox(height: 16),
                         // Second Row of ElevatedButtons
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                // Handle Button Press
-                                setState(() => _flag = 4);
-                                place.text = "Skyline";
-                                print('Skyline pressed');
-                              },
-                              child: Text('Skyline'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    flag(4) ? null : Colors.greenAccent,
-                              ),
-                            ),
-                            SizedBox(width: 16),
-                            ElevatedButton(
-                              onPressed: () {
-                                // Handle Button Press
-                                setState(() => _flag = 5);
-                                place.text = "Veggie";
-                                print('Veggie pressed');
-                              },
-                              child: Text('Veggie'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    flag(5) ? null : Colors.greenAccent,
-                              ),
-                            ),
+                        MultiSelectBubbleList(
+                          options: const [
+                            'Hardenbergstr.',
+                            'Pasteria',
+                            'MAR',
+                            'Skyline',
+                            'Veggie'
                           ],
+                          onSelectionChanged: (selectedItems) {
+                            setState(() {
+                              selectedOptions = selectedItems;
+                            });
+                          },
                         ),
-                        SizedBox(height: 16),
+                        SizedBox(height: 6),
                         // Preferences Section
+                        SizedBox(height: 16),
                         Container(
                           child: Text(
                             'Preferences',
-                            style: TextStyle(
-                                fontSize: 17, color: Color(0XFF6D7F94)),
+                            style: GoogleFonts.roboto(
+                              color: AppColors.textColorGray,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 20,
+                            ),
                           ),
                         ),
                         SizedBox(height: 16),
-                        // TextFields for Major and Semester
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(width: 16),
-                            SizedBox(width: 16),
-                            Column(
-                              children: [
-                                Text(
-                                  "Major",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Color(
-                                        0xFF6D7F94), // Set the text color to #6D7F94
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 300,
-                                  child: TextField(
-                                    controller: major,
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      border: OutlineInputBorder(),
-                                      hintText: 'optional',
-                                    ),
-                                    onChanged: (text) {
-                                      print(major.text);
-                                    },
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  "Semester",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Color(
-                                        0xFF6D7F94), // Set the text color to #6D7F94
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 300,
-                                  child: TextField(
-                                    controller: semester,
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      border: OutlineInputBorder(),
-                                      hintText: 'optional',
-                                    ),
-                                    keyboardType: TextInputType.number,
-                                    inputFormatters: <TextInputFormatter>[
-                                      FilteringTextInputFormatter.digitsOnly
-                                    ],
-                                    onChanged: (text) {
-                                      print('Preferred Semester: $semester');
-                                    },
-                                  ),
-                                ),
-                              ],
+                        Container(
+                          child: Text(
+                            'Major',
+                            style: GoogleFonts.roboto(
+                              color: AppColors.textColorGray,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 16,
                             ),
-                            SizedBox(height: 16),
-                          ],
+                          ),
                         ),
-                        // Time Frame Selection
-                        SizedBox(height: 16),
+                        input_textfield(
+                            controller: major,
+                            labelText: "Optional"),
+                        Container(
+                          child: Text(
+                            'Semester',
+                            style: GoogleFonts.roboto(
+                              color: AppColors.textColorGray,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        input_textfield(
+                            controller: semester,
+                            labelText: "Optional"),
                         button_primary(
                             buttonText: 'Plan new meeting',
                             onPressed: () {
