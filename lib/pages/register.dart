@@ -7,8 +7,12 @@ import 'package:mensa_match/components/wave_background.dart';
 import 'package:mensa_match/pages/login.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:mensa_match/appwrite/database_api.dart';
 import 'package:mensa_match/constants/colors.dart';
+import 'package:mensa_match/pages/home.dart';
+import 'package:cross_file_image/cross_file_image.dart';
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -23,6 +27,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final repeatPasswordTextController = TextEditingController();
   final nameController = TextEditingController();
   final studyProgramController = TextEditingController();
+  final database = DatabaseAPI();
+  XFile? image = null;
 
   createAccount() async {
     showDialog(
@@ -45,9 +51,19 @@ class _RegisterPageState extends State<RegisterPage> {
         email: emailTextController.text,
         password: passwordTextController.text,
       );
+      await appwrite.createEmailSession(
+        email: emailTextController.text,
+        password: passwordTextController.text,
+      );
+      await database.createUser(nameController.text, emailTextController.text, studyProgramController.text);
+      if(image!=null){
+        await database.saveimage(image: image!);
+      }
       Navigator.pop(context);
       const snackbar = SnackBar(content: Text('Account created!'));
       ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      appwrite.signOut();
+      Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
     } on AppwriteException catch (e) {
       Navigator.pop(context);
       showAlert(title: 'Account creation failed', text: e.message.toString());
@@ -120,11 +136,27 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                   const SizedBox(height: 32),
+                  Container(
+                    width: 200.0,
+                    height: 200.0,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: image !=null  ? !kIsWeb ? Image.file(File(image!.path)).image: NetworkImage(image!.path) : NetworkImage("https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png"),
+                        fit: BoxFit.scaleDown,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
                   ElevatedButton(
-                    onPressed: () async {
-                      final ImagePicker picker = ImagePicker();
-                      final XFile? image =
-                          await picker.pickImage(source: ImageSource.gallery);
+                    onPressed: ()  async{
+                        final ImagePicker picker =  ImagePicker();
+                        XFile? pickedImage = await picker.pickImage(source: ImageSource.gallery);
+                        if (pickedImage != null) {
+                          setState(() {
+                            image = pickedImage;
+                          });
+                        };
                     },
                     child: Text('Pick an image'),
                   ),
