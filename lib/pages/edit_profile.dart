@@ -43,6 +43,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Future<void> _loadUserProfile() async {
     try {
       final userProfile = await database.getUserProfile();
+      print(userProfile?.user_id);
+
       setState(() {
         _nameController.text = userProfile?.name ?? '';
         _emailController.text = userProfile?.email ?? '';
@@ -73,13 +75,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
         }
 
         await database.updateProfile(
-            name: _nameController.text,
-            email: _emailController.text,
-            bio: _bioController.text,
-            course: _courseController.text,
-            age: int.parse(_ageController.text), // Parse age from text to int
-            preferences: _preferencesController.text);
-        print("2.3");
+          name: _nameController.text,
+          email: _emailController.text,
+          bio: _bioController.text,
+          course: _courseController.text,
+          age: age,
+          preferences: _preferencesController.text,
+        );
       }
     } catch (e) {
       print('Error updating user profile: $e');
@@ -103,50 +105,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
       appBar: AppBar(
         title: Text('Edit Profile'),
       ),
-      body: LayoutBuilder(builder: (context, constraints) {
-        return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-                minWidth: constraints.maxWidth,
-                minHeight: constraints.maxHeight),
-            child: IntrinsicHeight(
-              child: Column(
-                children: [
-                  // Your existing TextFields and UI components
-                  TextField(
-                    controller: _nameController,
-                    decoration: InputDecoration(labelText: 'Name'),
-                  ),
-                  TextField(
-                    controller: _emailController,
-                    decoration: InputDecoration(labelText: 'Email'),
-                  ),
-                  TextField(
-                    controller: _bioController,
-                    decoration: InputDecoration(labelText: 'Bio'),
-                  ),
-                  TextField(
-                    controller: _courseController,
-                    decoration: InputDecoration(labelText: 'Course'),
-                  ),
-                  TextField(
-                    controller: _ageController,
-                    decoration: InputDecoration(labelText: 'Age'),
-                  ),
-                  TextField(
-                    controller: _preferencesController,
-                    decoration: InputDecoration(labelText: 'Preferences'),
-                  ),
-                  ElevatedButton(
-                    onPressed: _updateUserProfile,
-                    child: Text('Save'),
-                  ),
-                ],
-              ),
-            ),
+      body: Column(
+        children: [
+          _buildEditableTextField('Name', _nameController),
+          _buildEditableTextField('Email', _emailController),
+          _buildEditableTextField('Bio', _bioController),
+          _buildEditableTextField('Course', _courseController),
+          _buildEditableTextField('Age', _ageController),
+          _buildEditableTextField('Preferences', _preferencesController),
+          ElevatedButton(
+            onPressed: _updateUserProfile,
+            child: Text('Save'),
           ),
-        );
-      }),
+        ],
+      ),
     );
   }
 }
