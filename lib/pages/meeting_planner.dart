@@ -17,6 +17,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mensa_match/components/input_textfield.dart';
 import 'dart:convert';
 import 'package:mensa_match/pages/user_profile.dart';
+import 'package:async_foreach/async_foreach.dart';
 
 class MeetingPlanner extends StatefulWidget {
   const MeetingPlanner({Key? key}) : super(key: key);
@@ -198,17 +199,19 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
     int starthour_best = 0;
     int startmin_best = 0;
 
-    matches?.forEach((element) async{
+
+
+    await matches?.asyncForEach((element) async{
       int score = 0;
       int starthour_search = element.data['Starthour'];
       int startmin_search = element.data['Startmin'];
       int endhour_search = element.data['Endhour'];
       int endmin_search = element.data['Endmin'];
-      DateTime date_search = element.data['Date'];
+      DateTime date_search = DateTime.parse(element.data['Date']);
       String major_search = element.data['Major'];
       int semester_search = element.data['Semester'];
       String matcherid = element.data['matcher_id'];
-      List<String> place_search = jsonDecode(element.data['Place']);
+      List<dynamic> place_search = jsonDecode(element.data['Place']);
       bool isintime = true;
 
       if(date_search.day==date.day) {
@@ -249,23 +252,22 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
           score = score + 1;
         }
 
-
-        final my_profil = await database.getUserProfile();
-        final search_profil = await database.getUserProfile(searchid: matcherid);
+        final search_profil =  await database.getUserProfile(searchid: matcherid);
+        final my_profil =  await database.getUserProfile();
 
         if(major_search.isNotEmpty && major.text.isNotEmpty) {
           if (major_search.isNotEmpty && my_profil!.course.isNotEmpty) {
             if (major_search == my_profil!.course) {
-              score = score + 1;
+              score = score + 2;
             }
           }
           if(major.text.isNotEmpty&&search_profil!.course.isNotEmpty){
             if(major.text==search_profil!.course){
-              score = score + 1;
+              score = score + 2;
             }
           }
         }else{
-          score = score + 1;
+          score = score + 2;
         }
 
         if (score >= max_score && isintime) {
@@ -276,7 +278,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
       }
     });
 
-    if (bestfind != "") {
+    if (bestfind != "" && max_score >= 2) {
       connectMatch(bestfind, starthour_best, startmin_best);
       showCustomPopup('Match found', 'Your Match is now in the Homepage!');
     } else {

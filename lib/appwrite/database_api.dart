@@ -272,8 +272,7 @@ class DatabaseAPI {
     }
   }
 
-  Future<Document> addMatch(
-      {required List<String>  place, String major="", int semester = 0, required int starthour, required int startmin, required int endhour, required int endmin, required DateTime date}) {
+  Future<Document> addMatch({required List<String>  place, String major="", int semester = 0, required int starthour, required int startmin, required int endhour, required int endmin, required DateTime date}) {
     return databases.createDocument(
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_MATCH,
@@ -288,7 +287,7 @@ class DatabaseAPI {
           'Endhour': endhour,
           'Endmin': endmin,
           'user_id': auth.userid,
-          'Date': date,
+          'Date': date.toIso8601String(),
         });
   }
 
