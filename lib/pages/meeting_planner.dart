@@ -15,6 +15,8 @@ import 'package:mensa_match/components/time_picker.dart';
 import 'package:mensa_match/components/bubble.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mensa_match/components/input_textfield.dart';
+import 'dart:convert';
+import 'package:mensa_match/pages/user_profile.dart';
 
 class MeetingPlanner extends StatefulWidget {
   const MeetingPlanner({Key? key}) : super(key: key);
@@ -37,6 +39,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
   AuthStatus authStatus = AuthStatus.uninitialized;
   late List<Document>? matches = [];
 
+
   @override
   void initState() {
     super.initState();
@@ -55,7 +58,11 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
 
   createMatch() async {
     try {
-      if (place.text.isEmpty) {
+      if(starthour==0&&startmin==0||endhour==0&&endmin==0){
+        showCustomPopup('Error', 'Time cannot be empty!');
+        return;
+      }
+      if (selectedOptions.isEmpty) {
         showCustomPopup('Error', 'Mensa selection cannot be empty!');
         return;
       }
@@ -74,38 +81,46 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
       if (major.text.isEmpty) {
         if (semester.text.isEmpty) {
           await database.addMatch(
-              place: place.text,
+              place: selectedOptions,
               starthour: starthour,
               startmin: startmin,
               endhour: endhour,
-              endmin: endmin);
+              endmin: endmin,
+              date: date
+          );
         } else {
           await database.addMatch(
-              place: place.text,
+              place: selectedOptions,
               semester: int.parse(semester.text),
               starthour: starthour,
               startmin: startmin,
               endhour: endhour,
-              endmin: endmin);
+              endmin: endmin,
+              date: date
+          );
         }
       } else {
         if (semester.text.isEmpty) {
           await database.addMatch(
-              place: place.text,
+              place: selectedOptions,
               major: major.text,
               starthour: starthour,
               startmin: startmin,
               endhour: endhour,
-              endmin: endmin);
+              endmin: endmin,
+              date: date
+          );
         } else {
           await database.addMatch(
-              place: place.text,
+              place: selectedOptions,
               major: major.text,
               semester: int.parse(semester.text),
               starthour: starthour,
               startmin: startmin,
               endhour: endhour,
-              endmin: endmin);
+              endmin: endmin,
+              date: date
+          );
         }
       }
 
@@ -157,7 +172,11 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
   }
 
   searchMatches() async {
-    if (place.text.isEmpty) {
+    if(starthour==0&&startmin==0||endhour==0&&endmin==0){
+      showCustomPopup('Error', 'Time cannot be empty!');
+      return;
+    }
+    if (selectedOptions.isEmpty) {
       showCustomPopup('Error', 'Mensa selection cannot be empty!');
       return;
     }
@@ -179,45 +198,81 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
     int starthour_best = 0;
     int startmin_best = 0;
 
-    matches?.forEach((element) {
+    matches?.forEach((element) async{
       int score = 0;
-      int starthour_search = element.data.values.elementAt(5);
-      int startmin_search = element.data.values.elementAt(6);
-      int endhour_search = element.data.values.elementAt(7);
-      int endmin_search = element.data.values.elementAt(8);
-      String place_search = element.data.values.elementAt(1);
+      int starthour_search = element.data['Starthour'];
+      int startmin_search = element.data['Startmin'];
+      int endhour_search = element.data['Endhour'];
+      int endmin_search = element.data['Endmin'];
+      DateTime date_search = element.data['Date'];
+      String major_search = element.data['Major'];
+      int semester_search = element.data['Semester'];
+      String matcherid = element.data['matcher_id'];
+      List<String> place_search = jsonDecode(element.data['Place']);
       bool isintime = true;
 
-      if (starthour_search < starthour) {
-        if (starthour < endhour_search) {
-          starthour_best = starthour;
-          startmin_best = startmin;
+      if(date_search.day==date.day) {
+        if (starthour_search < starthour) {
+          if (starthour < endhour_search) {
+            starthour_best = starthour;
+            startmin_best = startmin;
+          } else {
+            if (starthour == endhour_search) {
+              if (startmin <= endmin_search) {
+                starthour_best = starthour;
+                startmin_best = startmin;
+              } else {
+                isintime = false;
+              }
+            }
+            isintime = false;
+          }
         } else {
-          if (starthour == endhour_search) {
-            if (startmin <= endmin_search) {
-              starthour_best = starthour;
-              startmin_best = startmin;
-            } else {
-              isintime = false;
+          if (starthour_search <= endhour) {
+            starthour_best = starthour_search;
+            startmin_best = startmin_search;
+          } else {
+            isintime = false;
+          }
+        }
+
+        bool sameplace = false;
+        place_search.forEach((pl_ser) {
+          selectedOptions.forEach((pl) {
+            if (pl_ser == pl) {
+              sameplace = false;
+            }
+          });
+        });
+
+        if(sameplace){
+          score = score + 1;
+        }
+
+
+        final my_profil = await database.getUserProfile();
+        final search_profil = await database.getUserProfile(searchid: matcherid);
+
+        if(major_search.isNotEmpty && major.text.isNotEmpty) {
+          if (major_search.isNotEmpty && my_profil!.course.isNotEmpty) {
+            if (major_search == my_profil!.course) {
+              score = score + 1;
             }
           }
-          isintime = false;
+          if(major.text.isNotEmpty&&search_profil!.course.isNotEmpty){
+            if(major.text==search_profil!.course){
+              score = score + 1;
+            }
+          }
+        }else{
+          score = score + 1;
         }
-      } else {
-        if (starthour_search <= endhour) {
-          starthour_best = starthour_search;
-          startmin_best = startmin_search;
-        } else {
-          isintime = false;
+
+        if (score >= max_score && isintime) {
+          bestfind = element.$id;
+          max_score = score;
         }
-      }
 
-      if (place_search == place) {
-        score = score + 1;
-      }
-
-      if (score >= max_score && isintime) {
-        bestfind = element.$id;
       }
     });
 

@@ -228,17 +228,20 @@ class DatabaseAPI {
   }
 
 
-  Future<UserProfile?> getUserProfile() async {
+  Future<UserProfile?> getUserProfile({String? searchid=""}) async {
     try {
       if (auth.userid == null) {
         print('User ID is null');
         return null;
       }
+      if(searchid==""){
+        searchid = await auth.userid;
+      }
       final response = await databases.listDocuments(
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_USERS,
         queries: [
-          Query.equal('user_id', [auth.userid!]),
+          Query.equal('user_id', [searchid!]),
         ],
       );
       if (response.documents.isNotEmpty) {
@@ -270,14 +273,14 @@ class DatabaseAPI {
   }
 
   Future<Document> addMatch(
-      {required String place, String major="", int semester = 0, required int starthour, required int startmin, required int endhour, required int endmin}) {
+      {required List<String>  place, String major="", int semester = 0, required int starthour, required int startmin, required int endhour, required int endmin, required DateTime date}) {
     return databases.createDocument(
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_MATCH,
         documentId: ID.unique(),
         data: {
           'Name': auth.username,
-          'Place': place,
+          'Place': jsonEncode(place),
           'Major': major,
           'Semester': semester,
           'Starthour': starthour,
@@ -285,6 +288,7 @@ class DatabaseAPI {
           'Endhour': endhour,
           'Endmin': endmin,
           'user_id': auth.userid,
+          'Date': date,
         });
   }
 
