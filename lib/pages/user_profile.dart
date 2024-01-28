@@ -6,6 +6,7 @@ class UserProfile {
   final int age;
   final String bio;
   final String preferences;
+  final int semester;
 
   UserProfile({
     required this.user_id,
@@ -15,6 +16,7 @@ class UserProfile {
     this.age = 0,
     this.bio = '',
     this.preferences = '',
+    this.semester = 0,
   });
 
   factory UserProfile.fromMap(Map<String, dynamic> map) {
@@ -26,6 +28,7 @@ class UserProfile {
       course: map['course'] ?? '',
       age: map['age'] as int ?? 0,
       preferences: map['preferences'] ?? '',
+      semester: map['semester'] as int ?? 0,
     );
   }
 
@@ -37,6 +40,7 @@ class UserProfile {
       'course': course,
       'age': age,
       'preferences': preferences,
+      'semester': semester,
     };
   }
 }
