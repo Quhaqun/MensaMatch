@@ -330,8 +330,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
                         PageHeader(
                             title: 'Meeting planner',
                             backButton: false,
-                            headerHeight: 150,
-                            onBackPressed: () {}),
+                            headerHeight: 150),
                         const SizedBox(height: 40),
                         Row(
                             mainAxisAlignment: MainAxisAlignment.center,

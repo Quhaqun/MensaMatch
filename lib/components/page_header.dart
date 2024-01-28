@@ -6,14 +6,13 @@ class PageHeader extends StatelessWidget {
   final String title;
   final bool backButton;
   final double headerHeight;
-  final Function onBackPressed;
 
-  const PageHeader(
-      {super.key,
-      required this.title,
-      required this.backButton,
-      required this.headerHeight,
-      required this.onBackPressed});
+  const PageHeader({
+    super.key,
+    required this.title,
+    required this.backButton,
+    required this.headerHeight,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,12 +24,27 @@ class PageHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (backButton)
-            IconButton(
-              icon: Icon(Icons.arrow_back),
-              color: Colors.white,
-              onPressed: onBackPressed(),
-            ),
-          if (backButton) const SizedBox(height: 16.0),
+            GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.chevron_left,
+                      size: 30.0,
+                      color: AppColors.white,
+                    ),
+                    Text(
+                      'Back',
+                      style: GoogleFonts.roboto(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 17,
+                      ),
+                    ),
+                  ],
+                )),
           Text(
             title,
             style: GoogleFonts.roboto(

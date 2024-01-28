@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:provider/provider.dart';
 import '../appwrite/database_api.dart';
-import 'package:mensa_match/pages/user_profile.dart';
+import 'package:mensa_match/constants/colors.dart';
+import 'package:mensa_match/components/input_textfield.dart';
+import 'package:mensa_match/components/button_primary.dart';
+import 'package:mensa_match/components/wave_background.dart';
+import 'package:mensa_match/components/page_header.dart';
+import 'package:mensa_match/components/bubble.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:mensa_match/components/image_picker.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({Key? key}) : super(key: key);
@@ -19,6 +26,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
   late final TextEditingController _courseController;
   late final TextEditingController _ageController;
   late final TextEditingController _preferencesController;
+  late final TextEditingController _semesterController;
+  List<String> selectedPreferences = [];
+  XFile? _image = null;
+
   AuthStatus authStatus = AuthStatus.uninitialized;
 
   @override
@@ -30,6 +41,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _courseController = TextEditingController();
     _ageController = TextEditingController();
     _preferencesController = TextEditingController();
+    _semesterController = TextEditingController();
 
     _loadUserProfile(); // Call _loadUserProfile here directly
 
@@ -66,7 +78,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
         // Parse age from text to int, handle invalid input gracefully
         int? age;
         try {
-          age = _ageController.text.isNotEmpty ? int.parse(_ageController.text) : null;
+          age = _ageController.text.isNotEmpty
+              ? int.parse(_ageController.text)
+              : null;
         } catch (e) {
           print('Invalid age format');
           // Handle the error or provide a default value for age
@@ -92,7 +106,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-  Widget _buildEditableTextField(String label, TextEditingController controller) {
+  Widget _buildEditableTextField(
+      String label, TextEditingController controller) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(labelText: label),
@@ -102,23 +117,93 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Edit Profile'),
-      ),
-      body: Column(
-        children: [
-          _buildEditableTextField('Name', _nameController),
-          _buildEditableTextField('Email', _emailController),
-          _buildEditableTextField('Bio', _bioController),
-          _buildEditableTextField('Course', _courseController),
-          _buildEditableTextField('Age', _ageController),
-          _buildEditableTextField('Preferences', _preferencesController),
-          ElevatedButton(
-            onPressed: _updateUserProfile,
-            child: Text('Save'),
+      backgroundColor: AppColors.backgroundColorLight,
+      body: LayoutBuilder(builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: IntrinsicHeight(
+              child: CustomPaint(
+                painter: WaveBackgroundPainterShort(baseHeight: 160),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      PageHeader(
+                          title: 'Edit Profile',
+                          backButton: true,
+                          headerHeight: 150),
+                      const SizedBox(height: 40),
+                      Column(
+                        children: [
+                          CircularImagePicker(
+                              overlayText: 'Edit',
+                              onImageSelected: (selectedImage) {
+                                setState(() {
+                                  _image = selectedImage;
+                                });
+                              }),
+                          const SizedBox(height: 20),
+                          input_textfield(
+                              controller: _nameController, labelText: 'Name'),
+                          input_textfield(
+                              controller: _emailController, labelText: 'Email'),
+                          Row(
+                            children: [
+                              Expanded(
+                                  child: Container(
+                                margin: EdgeInsets.only(right: 4.0),
+                                child: input_textfield(
+                                    controller: _ageController,
+                                    labelText: 'Age'),
+                              )),
+                              Expanded(
+                                  child: Container(
+                                margin: EdgeInsets.only(left: 4.0),
+                                child: input_textfield(
+                                    controller: _semesterController,
+                                    labelText: 'Semester'),
+                              ))
+                            ],
+                          ),
+                          input_textfield(
+                              controller: _courseController,
+                              labelText: 'Major'),
+                          input_textfield(
+                              controller: _bioController,
+                              labelText: 'Bio',
+                              maxLines: 4),
+                          const SizedBox(height: 20),
+                          MultiSelectBubbleList(
+                              options: const [
+                                'Tennis',
+                                'Gym',
+                                'Programming',
+                                'Dogs',
+                                'Photography',
+                                'Nature',
+                                'Travelling',
+                                'Cooking',
+                                'Environmentalism'
+                              ],
+                              onSelectionChanged: (onSelectionChanged) {
+                                selectedPreferences = onSelectionChanged;
+                              }),
+                          const SizedBox(height: 10),
+                          button_primary(
+                              buttonText: 'Save',
+                              onPressed: _updateUserProfile),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
-        ],
-      ),
+        );
+      }),
     );
   }
 }

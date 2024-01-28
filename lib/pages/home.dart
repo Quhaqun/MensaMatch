@@ -84,8 +84,7 @@ class _HomeState extends State<Home> {
                               PageHeader(
                                   title: 'Home',
                                   backButton: false,
-                                  headerHeight: 150,
-                                  onBackPressed: () {}),
+                                  headerHeight: 150),
                               const SizedBox(height: 40),
                               Text(
                                 'Upcoming Lunch Meetings',
