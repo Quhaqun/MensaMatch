@@ -42,7 +42,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _ageController = TextEditingController();
     _preferencesController = TextEditingController();
     _semesterController = TextEditingController();
-
+    //_initProfile();
     _loadUserProfile(); // Call _loadUserProfile here directly
 
     WidgetsBinding.instance?.addPostFrameCallback((_) {
@@ -52,18 +52,42 @@ class _EditProfilePageState extends State<EditProfilePage> {
     });
   }
 
-  Future<void> _loadUserProfile() async {
+
+  Future<void> _initProfile() async {
     try {
-      final userProfile = await database.getUserProfile();
-      print(userProfile?.user_id);
+      final userData = await database.getCurrentUser();
+      print("userData");
+      print(userData);
 
       setState(() {
-        _nameController.text = userProfile?.name ?? '';
-        _emailController.text = userProfile?.email ?? '';
-        _bioController.text = userProfile?.bio ?? '';
-        _courseController.text = userProfile?.course ?? '';
-        _ageController.text = userProfile?.age?.toString() ?? '';
-        _preferencesController.text = userProfile?.preferences ?? '';
+        _nameController.text = userData["name"] ?? '';
+        _emailController.text = userData["email"]  ?? '';
+        _bioController.text = userData["bio"] ?? '';
+        _courseController.text = userData["course"] ?? '';
+        _ageController.text = userData["age"].toString() ?? '';
+        _preferencesController.text = userData["preferences"] ?? '';
+        _semesterController.text = userData["semester"] ?? '';
+      });
+    } catch (e) {
+      print('Error fetching user profile: $e $authStatus');
+      // Handle error as needed
+    }
+  }
+
+  Future<void> _loadUserProfile() async {
+    try {
+      final userData = await database.getCurrentUser();
+      print("userData");
+      print(userData);
+
+      setState(() {
+        _nameController.text = userData["name"] ?? '';
+        _emailController.text = userData["email"]  ?? '';
+        _bioController.text = userData["bio"] ?? '';
+        _courseController.text = userData["course"] ?? '';
+        _ageController.text = userData["age"].toString() ?? '';
+        _preferencesController.text = userData["preferences"] ?? '';
+        _semesterController.text = userData["semester"] ?? '';
       });
     } catch (e) {
       print('Error fetching user profile: $e $authStatus');
@@ -77,15 +101,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (authStatus == AuthStatus.authenticated) {
         // Parse age from text to int, handle invalid input gracefully
         int? age;
+        int? semester;
         try {
-          age = _ageController.text.isNotEmpty
-              ? int.parse(_ageController.text)
-              : null;
+          semester = _semesterController.text.isNotEmpty ? int.parse(_semesterController.text) : null;
+          age = _ageController.text.isNotEmpty ? int.parse(_ageController.text) : null;
         } catch (e) {
           print('Invalid age format');
           // Handle the error or provide a default value for age
           // For example, you can set age to a default value like 0
           age = userProfile?.age;
+          semester = userProfile?.semester;
         }
 
         await database.updateProfile(
@@ -95,19 +120,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
           course: _courseController.text,
           age: age,
           preferences: _preferencesController.text,
+          semester: semester
         );
       }
     } catch (e) {
       print('Error updating user profile: $e');
       // Handle error as needed
-    } finally {
-      // Move _loadUserProfile outside of the try-catch block to ensure it always gets called
-      await _loadUserProfile();
     }
   }
 
-  Widget _buildEditableTextField(
-      String label, TextEditingController controller) {
+    Widget _buildEditableTextField(
+        String label, TextEditingController controller) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(labelText: label),
@@ -133,7 +156,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       PageHeader(
                           title: 'Edit Profile',
                           backButton: true,
-                          headerHeight: 150),
+                          headerHeight: 150, onBackPressed: () {},),
                       const SizedBox(height: 40),
                       Column(
                         children: [
@@ -153,18 +176,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             children: [
                               Expanded(
                                   child: Container(
-                                margin: EdgeInsets.only(right: 4.0),
-                                child: input_textfield(
-                                    controller: _ageController,
-                                    labelText: 'Age'),
-                              )),
+                                    margin: EdgeInsets.only(right: 4.0),
+                                    child: input_textfield(
+                                        controller: _ageController,
+                                        labelText: 'Age'),
+                                  )),
                               Expanded(
                                   child: Container(
-                                margin: EdgeInsets.only(left: 4.0),
-                                child: input_textfield(
-                                    controller: _semesterController,
-                                    labelText: 'Semester'),
-                              ))
+                                    margin: EdgeInsets.only(left: 4.0),
+                                    child: input_textfield(
+                                        controller: _semesterController,
+                                        labelText: 'Semester'),
+                                  ))
                             ],
                           ),
                           input_textfield(
