@@ -1,5 +1,6 @@
 
 import 'dart:ffi' if (dart.library.html) 'dart:html' as html;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
@@ -181,8 +182,11 @@ class DatabaseAPI {
     String? course,
     int? age,
     String? preferences,
+    int? semester,
   }) async {
     try {
+      auth = AuthAPI();
+      await auth.loadUser();
       final existingUserProfile = await getUserProfile();
       final filteredUser = await databases.listDocuments(
         databaseId: APPWRITE_DATABASE_ID,
@@ -191,7 +195,8 @@ class DatabaseAPI {
           Query.equal("user_id", [auth.userid]),
         ],
       );
-
+      print("name of user");
+      print(existingUserProfile?.name);
       var docId = filteredUser.documents.first.$id;
 
       final Map<String, dynamic> updateData = {};
@@ -202,10 +207,18 @@ class DatabaseAPI {
       _updateField(updateData, 'course', course, existingUserProfile?.course);
       _updateField(updateData, 'preferences', preferences, existingUserProfile?.preferences);
 
+
       if (existingUserProfile?.age != age) {
         updateData['age'] = age ?? existingUserProfile?.age;
       }
 
+      if (existingUserProfile?.semester != semester) {
+        updateData['semester'] = semester ?? existingUserProfile?.semester;
+      }
+
+
+      print("new Data");
+      print(updateData);
       await databases.updateDocument(
         collectionId: COLLECTION_USERS,
         documentId: docId,
@@ -220,28 +233,62 @@ class DatabaseAPI {
   }
 
   void _updateField(Map<String, dynamic> updateData, String fieldName, String? newValue, String? oldValue) {
+    print("old value");
+    print(oldValue);
+    print("new Value");
+    print(newValue);
     if (newValue != null && newValue.isNotEmpty) {
+      print("it is: ");
+      print(newValue);
       updateData[fieldName] = newValue;
     } else if (oldValue != null && oldValue.isNotEmpty) {
       updateData[fieldName] = oldValue;
+      print("it is: ");
+      print(oldValue);
+    }
+  }
+
+  Future<Map<String, dynamic>> getCurrentUser() async {
+    auth = AuthAPI();
+    await auth.loadUser();
+    final user = await databases.listDocuments(
+      databaseId: APPWRITE_DATABASE_ID,
+      collectionId: COLLECTION_USERS,
+      queries: [
+        Query.equal("user_id", [auth.userid]),
+      ],
+    );
+
+    if (user.documents.isNotEmpty) {
+      try {
+        final userDataMap = user.documents.first.data;
+        return userDataMap;
+      } catch (e) {
+        print("Error retrieving user data: $e");
+        return {};
+      }
+    } else {
+      // Handle the case when the document is not found
+      // For example, return an empty Map or throw an exception
+      return {};
     }
   }
 
 
-  Future<UserProfile?> getUserProfile({String? searchid=""}) async {
+
+  Future<UserProfile?> getUserProfile() async {
     try {
+      auth = AuthAPI();
+      await auth.loadUser();
       if (auth.userid == null) {
         print('User ID is null');
         return null;
-      }
-      if(searchid==""){
-        searchid = await auth.userid;
       }
       final response = await databases.listDocuments(
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_USERS,
         queries: [
-          Query.equal('user_id', [searchid!]),
+          Query.equal('user_id', [auth.userid!]),
         ],
       );
       if (response.documents.isNotEmpty) {
@@ -353,6 +400,7 @@ class DatabaseAPI {
     );
   }
 
+
   saveimage({required XFile image}) async{
     String fileid = await auth.userid as String;
     if(kIsWeb){
@@ -369,9 +417,9 @@ class DatabaseAPI {
     }else{
       if(image.path !=null && image.name!=null && fileid!=null){
         return storage.createFile(
-          bucketId: COLLECTION_Images,
-          fileId:  fileid,
-          file: InputFile.fromPath(path: image.path, filename: image.name)
+            bucketId: COLLECTION_Images,
+            fileId:  fileid,
+            file: InputFile.fromPath(path: image.path, filename: image.name)
         );
       }else{
         print("path, imageName or userid was null");
