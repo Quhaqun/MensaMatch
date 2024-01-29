@@ -16,7 +16,7 @@ class UserProfile {
     this.age = 0,
     this.bio = '',
     this.preferences = '',
-    this.semester = 0,
+    this.semester = 0
   });
 
   factory UserProfile.fromMap(Map<String, dynamic> map) {
@@ -28,7 +28,7 @@ class UserProfile {
       course: map['course'] ?? '',
       age: map['age'] as int ?? 0,
       preferences: map['preferences'] ?? '',
-      semester: map['semester'] as int ?? 0,
+      semester: map['age'] as int ?? 0,
     );
   }
 
@@ -40,7 +40,7 @@ class UserProfile {
       'course': course,
       'age': age,
       'preferences': preferences,
-      'semester': semester,
+      'semester': semester
     };
   }
 }
