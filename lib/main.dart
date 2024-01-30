@@ -1,6 +1,7 @@
 import 'package:mensa_match/pages/login.dart';
 import 'package:mensa_match/pages/home.dart';
 import 'package:mensa_match/pages/settings.dart';
+import 'package:mensa_match/pages/profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
       )
           : value == AuthStatus.authenticated
           ? const Home()
-          : const LoginPage(),
+          : const Home(),
     );
   }
 }

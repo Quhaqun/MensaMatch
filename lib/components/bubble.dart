@@ -75,7 +75,7 @@ class BubbleElement extends StatelessWidget {
           backgroundColor: MaterialStateProperty.resolveWith<Color>(
             (Set<MaterialState> states) {
               if (isSelected) {
-                return AppColors.accentColor1;
+                return AppColors.primaryColor;
               } else {
                 return AppColors.cardColor;
               }
@@ -99,6 +99,36 @@ class BubbleElement extends StatelessWidget {
               fontWeight: FontWeight.w400,
               fontSize: 18,
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ReadOnlyBubbleList extends StatelessWidget {
+  final List<String> availableOptions;
+  final List<String> selectedOptions;
+
+  const ReadOnlyBubbleList({
+    Key? key,
+    required this.availableOptions,
+    required this.selectedOptions,
+  }) : super(key: key);
+
+  @override
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 10.0,
+        children: List.generate(
+          availableOptions.length,
+          (index) => BubbleElement(
+            buttonText: availableOptions[index],
+            onPressed: (){}, // Disable the button for read-only
+            isSelected: selectedOptions.contains(availableOptions[index]),
           ),
         ),
       ),

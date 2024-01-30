@@ -66,7 +66,7 @@ class _MyIconToolbarState extends State<MyIconToolbar> {
         break;
       case 3:
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => EditProfilePage()));//Profile()));
+            context, MaterialPageRoute(builder: (context) => Profile()));
         break;
       case 4:
         Navigator.push(
