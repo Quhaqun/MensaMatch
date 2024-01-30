@@ -6,10 +6,12 @@ import 'package:image_picker/image_picker.dart';
 class CircularImagePicker extends StatefulWidget {
   final Function(XFile?) onImageSelected;
   final String? overlayText;
+  final double imageSize;
 
   const CircularImagePicker({
     Key? key,
     required this.onImageSelected,
+    this.imageSize = 180.0,
     this.overlayText,
   }) : super(key: key);
 
@@ -29,8 +31,8 @@ class _CircularImagePickerState extends State<CircularImagePicker> {
         alignment: Alignment.center,
         children: [
           Container(
-            width: 180,
-            height: 180,
+            width: widget.imageSize,
+            height: widget.imageSize,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.grey[200], // Placeholder color
@@ -39,8 +41,8 @@ class _CircularImagePickerState extends State<CircularImagePicker> {
                 ? ClipOval(
                     child: Image.network(
                       _image!.path,
-                      width: 180,
-                      height: 180,
+                      width: widget.imageSize,
+                      height: widget.imageSize,
                       fit: BoxFit.cover,
                     ),
                   )

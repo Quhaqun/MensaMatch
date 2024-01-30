@@ -13,6 +13,7 @@ import 'package:mensa_match/components/page_header.dart';
 import 'package:cross_file_image/cross_file_image.dart';
 import 'dart:io';
 import 'package:mensa_match/components/image_picker.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class RegisterPage extends StatefulWidget {
@@ -112,26 +113,41 @@ class _RegisterPageState extends State<RegisterPage> {
                                 backButton: true,
                                 headerHeight: 150),
                             const SizedBox(height: 40),
-                            const SizedBox(height: 2),
-                            const Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                'Create your new account, we are glad you are joining us',
-                                style: TextStyle(fontSize: 17),
+                            Text(
+                              'Create your new account, we are glad you are joining us',
+                              style: GoogleFonts.roboto(
+                                color: AppColors.textColorGray,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 18,
                               ),
                             ),
                             const SizedBox(height: 32),
-                            CircularImagePicker(
-                                onImageSelected: (selectedImage) {
-                                  setState(() {
-                                    image = selectedImage;
-                                  });
-                                }),
-                            input_textfield(
-                                controller: nameController, labelText: 'Name'),
-                            input_textfield(
-                                controller: studyProgramController,
-                                labelText: 'Study Program'),
+                            Row(
+                              children: [
+                                Container(
+                                  child: CircularImagePicker(
+                                      imageSize: 140,
+                                      onImageSelected: (selectedImage) {
+                                        setState(() {
+                                          image = selectedImage;
+                                        });
+                                      }),
+                                ),
+                                const SizedBox(width: 30),
+                                Expanded(
+                                  child: Column(
+                                    children: [
+                                      input_textfield(
+                                          controller: nameController,
+                                          labelText: 'Name'),
+                                      input_textfield(
+                                          controller: studyProgramController,
+                                          labelText: 'Study Program'),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                             input_textfield(
                                 controller: emailTextController,
                                 labelText: 'Email'),
