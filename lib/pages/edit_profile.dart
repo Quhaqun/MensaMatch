@@ -156,7 +156,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       PageHeader(
                           title: 'Edit Profile',
                           backButton: true,
-                          headerHeight: 150, onBackPressed: () {},),
+                          headerHeight: 150),
                       const SizedBox(height: 40),
                       Column(
                         children: [

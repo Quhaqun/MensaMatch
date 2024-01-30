@@ -252,7 +252,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
           score = score + 1;
         }
 
-        final search_profil =  await database.getUserProfile(searchid: matcherid);
+        final search_profil =  await database.getUserProfile(); // uncommented: await database.getUserProfile(searchid: matcherid);
         final my_profil =  await database.getUserProfile();
 
         if(major_search.isNotEmpty && major.text.isNotEmpty) {
