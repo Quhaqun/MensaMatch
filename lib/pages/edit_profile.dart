@@ -119,8 +119,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
           bio: _bioController.text,
           course: _courseController.text,
           age: age,
-          preferences: _preferencesController.text,
-          semester: semester
+          preferences: selectedPreferences.join(', '), // or any other separator
+          semester: semester,
         );
       }
     } catch (e) {
@@ -199,20 +199,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               maxLines: 4),
                           const SizedBox(height: 20),
                           MultiSelectBubbleList(
-                              options: const [
-                                'Tennis',
-                                'Gym',
-                                'Programming',
-                                'Dogs',
-                                'Photography',
-                                'Nature',
-                                'Travelling',
-                                'Cooking',
-                                'Environmentalism'
-                              ],
-                              onSelectionChanged: (onSelectionChanged) {
+                            options: const [
+                              'Tennis',
+                              'Gym',
+                              'Programming',
+                              'Dogs',
+                              'Photography',
+                              'Nature',
+                              'Travelling',
+                              'Cooking',
+                              'Environmentalism'
+                            ],
+                            onSelectionChanged: (onSelectionChanged) {
+                              setState(() {
                                 selectedPreferences = onSelectionChanged;
-                              }),
+                              });
+                            },
+                          ),
                           const SizedBox(height: 10),
                           button_primary(
                               buttonText: 'Save',

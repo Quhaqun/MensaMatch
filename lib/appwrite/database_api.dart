@@ -163,7 +163,7 @@ class DatabaseAPI {
           'age': 0,
           'semester': 0,
           'bio': "",
-          'preferences': "",
+          'preferences': [], // Change here
           'user_id': auth.userid
         },
       );
@@ -237,7 +237,7 @@ class DatabaseAPI {
     print(oldValue);
     print("new Value");
     print(newValue);
-    if (newValue != null && newValue.isNotEmpty) {
+    if (newValue != null && ((newValue is List && newValue.isNotEmpty) || newValue is! List)) {
       print("it is: ");
       print(newValue);
       updateData[fieldName] = newValue;
@@ -251,6 +251,7 @@ class DatabaseAPI {
   Future<Map<String, dynamic>> getCurrentUser() async {
     auth = AuthAPI();
     await auth.loadUser();
+
     final user = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_USERS,
@@ -262,15 +263,34 @@ class DatabaseAPI {
     if (user.documents.isNotEmpty) {
       try {
         final userDataMap = user.documents.first.data;
-        return userDataMap;
+
+        // Perform null checks before accessing values
+        final name = userDataMap['name'] as String? ?? '';
+        final email = userDataMap['email'] as String? ?? '';
+        final bio = userDataMap['bio'] as String? ?? '';
+        final course = userDataMap['course'] as String? ?? '';
+        final age = userDataMap['age'] as int? ?? 0;
+        final semester = userDataMap['semester'] as int? ?? 0;
+
+        // Handle the comma-separated string for preferences
+        final preferencesString = userDataMap['preferences'] as String? ?? '';
+        final preferences = preferencesString.split(',').map((e) => e.trim()).toList();
+
+        return {
+          'name': name,
+          'email': email,
+          'bio': bio,
+          'course': course,
+          'age': age,
+          'semester': semester,
+          'preferences': preferences,
+        };
       } catch (e) {
         print("Error retrieving user data: $e");
         return {};
       }
     } else {
-      // Handle the case when the document is not found
-      // For example, return an empty Map or throw an exception
-      return {};
+      return {}; // Return empty map if user document is not found
     }
   }
 
@@ -339,6 +359,8 @@ class DatabaseAPI {
   }
 
   Future<DocumentList> getMatches() async {
+    auth = AuthAPI();
+    await auth.loadUser();
     final userMatches = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MATCH,
