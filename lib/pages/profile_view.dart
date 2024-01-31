@@ -37,8 +37,6 @@ class _ProfileState extends State<Profile> {
       final loadedUserData = await database.getCurrentUser();
       print("userData");
       print(loadedUserData);
-      print("name");
-      print(loadedUserData["age"]);
 
       setState(() {
         userData = loadedUserData;  // Set instance variable
