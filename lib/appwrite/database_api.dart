@@ -196,8 +196,6 @@ class DatabaseAPI {
           Query.equal("user_id", [auth.userid]),
         ],
       );
-      print("name of user");
-      print(existingUserProfile?.name);
       var docId = filteredUser.documents.first.$id;
 
       final Map<String, dynamic> updateData = {};
@@ -233,16 +231,21 @@ class DatabaseAPI {
     }
   }
 
-  void _updateField(Map<String, dynamic> updateData, String fieldName, String? newValue, String? oldValue) {
+  void _updateField(Map<String, dynamic> updateData, String fieldName, dynamic newValue, dynamic oldValue) {
     print("old value");
     print(oldValue);
     print("new Value");
     print(newValue);
-    if (newValue != null && ((newValue is List && newValue.isNotEmpty) || newValue is! List)) {
-      print("it is: ");
-      print(newValue);
-      updateData[fieldName] = newValue;
-    } else if (oldValue != null && oldValue.isNotEmpty) {
+
+    if (newValue != null) {
+      if (newValue is int) {
+        updateData[fieldName] = newValue.toString();
+      } else if (newValue is List && newValue.isNotEmpty) {
+        updateData[fieldName] = newValue;
+      } else if (newValue is String && newValue.isNotEmpty) {
+        updateData[fieldName] = newValue;
+      }
+    } else if (oldValue != null && oldValue is String && oldValue.isNotEmpty) {
       updateData[fieldName] = oldValue;
       print("it is: ");
       print(oldValue);
@@ -324,6 +327,7 @@ class DatabaseAPI {
               age: userDataMap['age'] as int,
               bio: userDataMap['bio'],
               preferences: userDataMap['preferences'],
+              semester: userDataMap['semester'],
               user_id: userDataMap['user_id']
           );
           return userProfile;

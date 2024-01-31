@@ -71,7 +71,7 @@ class _ProfileState extends State<Profile> {
                       height: MediaQuery.of(context).size.width, // Aspect ratio 1:1
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: NetworkImage(userData["profile_picture"] ?? 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?cs=srgb&dl=pexels-andrea-piacquadio-774909.jpg&fm=jpg'), // Set image URL from user data
+                          image: NetworkImage('https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?cs=srgb&dl=pexels-andrea-piacquadio-774909.jpg&fm=jpg'),//userData["profile_picture"] ?? 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?cs=srgb&dl=pexels-andrea-piacquadio-774909.jpg&fm=jpg'), // Set image URL from user data
                           fit: BoxFit.cover,
                         ),
                       ),

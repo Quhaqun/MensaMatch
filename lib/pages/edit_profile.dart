@@ -66,7 +66,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _courseController.text = userData["course"] ?? '';
         _ageController.text = userData["age"].toString() ?? '';
         _preferencesController.text = userData["preferences"] ?? '';
-        _semesterController.text = userData["semester"] ?? '';
+        _semesterController.text = userData["semester"].toString() ?? '';
       });
     } catch (e) {
       print('Error fetching user profile: $e $authStatus');
@@ -87,7 +87,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _courseController.text = userData["course"] ?? '';
         _ageController.text = userData["age"].toString() ?? '';
         _preferencesController.text = userData["preferences"] ?? '';
-        _semesterController.text = userData["semester"] ?? '';
+        _semesterController.text = userData["semester"].toString() ?? '';
       });
     } catch (e) {
       print('Error fetching user profile: $e $authStatus');
