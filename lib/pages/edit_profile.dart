@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:provider/provider.dart';
@@ -56,8 +57,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Future<void> _initProfile() async {
     try {
       final userData = await database.getCurrentUser();
-      print("userData");
-      print(userData);
 
       setState(() {
         _nameController.text = userData["name"] ?? '';
@@ -106,7 +105,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
           semester = _semesterController.text.isNotEmpty ? int.parse(_semesterController.text) : null;
           age = _ageController.text.isNotEmpty ? int.parse(_ageController.text) : null;
         } catch (e) {
-          print('Invalid age format');
+          if (kDebugMode) {
+            print('Invalid age format');
+          }
           // Handle the error or provide a default value for age
           // For example, you can set age to a default value like 0
           age = userProfile?.age;
@@ -120,11 +121,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
           course: _courseController.text,
           age: age,
           preferences: selectedPreferences.join(', '), // or any other separator
-          semester: semester,
+          semester: semester, // Convert to string before assigning
         );
       }
     } catch (e) {
-      print('Error updating user profile: $e');
+      if (kDebugMode) {
+        print('Error updating user profile: $e');
+      }
       // Handle error as needed
     }
   }
