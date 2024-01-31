@@ -164,7 +164,8 @@ class DatabaseAPI {
           'semester': 0,
           'bio': "",
           'preferences': [], // Change here
-          'user_id': auth.userid
+          'user_id': auth.userid,
+          'profile_picture': "",
         },
       );
     } else {
@@ -271,6 +272,7 @@ class DatabaseAPI {
         final course = userDataMap['course'] as String? ?? '';
         final age = userDataMap['age'] as int? ?? 0;
         final semester = userDataMap['semester'] as int? ?? 0;
+        final profile_picture = userDataMap['profile_picture'] as String? ?? '';
 
         // Handle the comma-separated string for preferences
         final preferencesString = userDataMap['preferences'] as String? ?? '';
@@ -284,6 +286,7 @@ class DatabaseAPI {
           'age': age,
           'semester': semester,
           'preferences': preferences,
+          'profile_picture': profile_picture,
         };
       } catch (e) {
         print("Error retrieving user data: $e");

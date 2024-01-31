@@ -14,7 +14,6 @@ class Profile extends StatefulWidget {
 
   @override
   _ProfileState createState() => _ProfileState();
-
 }
 
 class _ProfileState extends State<Profile> {
@@ -74,7 +73,7 @@ class _ProfileState extends State<Profile> {
                       height: MediaQuery.of(context).size.width, // Aspect ratio 1:1
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image:NetworkImage(userData["profile_picture"] ?? 'https://a.storyblok.com/f/191576/1200x800/faa88c639f/round_profil_picture_before_.webp'), // Set image URL from user data
+                          image: NetworkImage(userData["profile_picture"] ?? 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?cs=srgb&dl=pexels-andrea-piacquadio-774909.jpg&fm=jpg'), // Set image URL from user data
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -120,10 +119,11 @@ class _ProfileState extends State<Profile> {
                                 ),
                                 onPressed: () {
                                   Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              EditProfilePage()));
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditProfilePage(),
+                                    ),
+                                  );
                                 },
                               ),
                             ),
