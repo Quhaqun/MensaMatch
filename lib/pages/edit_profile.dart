@@ -65,7 +65,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _courseController.text = userData["course"] ?? '';
         _ageController.text = userData["age"].toString() ?? '';
         _semesterController.text = userData["semester"].toString() ?? '';
-        _preferencesController.text = userData["preferences"] ?? [];
+        _preferencesController.text = userData["preferences"]?.join(', ') ?? '';
+
 
       });
     } catch (e) {
