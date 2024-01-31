@@ -232,10 +232,6 @@ class DatabaseAPI {
   }
 
   void _updateField(Map<String, dynamic> updateData, String fieldName, dynamic newValue, dynamic oldValue) {
-    print("old value");
-    print(oldValue);
-    print("new Value");
-    print(newValue);
 
     if (newValue != null) {
       if (newValue is int) {
@@ -247,8 +243,6 @@ class DatabaseAPI {
       }
     } else if (oldValue != null && oldValue is String && oldValue.isNotEmpty) {
       updateData[fieldName] = oldValue;
-      print("it is: ");
-      print(oldValue);
     }
   }
 
@@ -268,7 +262,6 @@ class DatabaseAPI {
       try {
         final userDataMap = user.documents.first.data;
 
-        // Perform null checks before accessing values
         final name = userDataMap['name'] as String? ?? '';
         final email = userDataMap['email'] as String? ?? '';
         final bio = userDataMap['bio'] as String? ?? '';
@@ -277,10 +270,12 @@ class DatabaseAPI {
         final semester = userDataMap['semester'] as int? ?? 0;
         final profile_picture = userDataMap['profile_picture'] as String? ?? '';
 
+        print("current user preferences");
+        print(userDataMap['preferences']);
         // Handle the comma-separated string for preferences
         final preferencesString = userDataMap['preferences'] as String? ?? '';
         final preferences = preferencesString.split(',').map((e) => e.trim()).toList();
-
+        print(preferences);
         return {
           'name': name,
           'email': email,
@@ -320,6 +315,8 @@ class DatabaseAPI {
       if (response.documents.isNotEmpty) {
         try {
           final userDataMap = response.documents.first.data;
+          print("preferences");
+          print(userDataMap["preferences"]);
           final userProfile = UserProfile(
               name: userDataMap['name'],
               course: userDataMap['course'],
@@ -327,7 +324,7 @@ class DatabaseAPI {
               age: userDataMap['age'] as int,
               bio: userDataMap['bio'],
               preferences: userDataMap['preferences'],
-              semester: userDataMap['semester'],
+              semester: userDataMap['semester'] as int,
               user_id: userDataMap['user_id']
           );
           return userProfile;
@@ -336,9 +333,7 @@ class DatabaseAPI {
           return null;
         }
       } else {
-        // Handle the case when the document is not found
-        // For example, return an empty UserProfile or throw an exception
-        return null; // Replace this with your desired behavior
+        return null;
       }
     }
     catch(e){

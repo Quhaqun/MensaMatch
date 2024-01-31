@@ -5,7 +5,7 @@ class UserProfile {
   final String email;
   final int age;
   final String bio;
-  final String preferences;
+  final List<String> preferences;
   final int semester;
 
   UserProfile({
@@ -15,9 +15,10 @@ class UserProfile {
     this.email = '',
     this.age = 0,
     this.bio = '',
-    this.preferences = '',
-    this.semester = 0
+    required this.preferences,
+    this.semester = 0,
   });
+
 
   factory UserProfile.fromMap(Map<String, dynamic> map) {
     return UserProfile(

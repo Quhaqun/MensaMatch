@@ -43,8 +43,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _ageController = TextEditingController();
     _preferencesController = TextEditingController();
     _semesterController = TextEditingController();
-    //_initProfile();
-    _loadUserProfile(); // Call _loadUserProfile here directly
+    _loadUserProfile();
 
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       final AuthAPI appwrite = context.read<AuthAPI>();
@@ -53,31 +52,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
     });
   }
 
-
-  Future<void> _initProfile() async {
-    try {
-      final userData = await database.getCurrentUser();
-
-      setState(() {
-        _nameController.text = userData["name"] ?? '';
-        _emailController.text = userData["email"]  ?? '';
-        _bioController.text = userData["bio"] ?? '';
-        _courseController.text = userData["course"] ?? '';
-        _ageController.text = userData["age"].toString() ?? '';
-        _preferencesController.text = userData["preferences"] ?? '';
-        _semesterController.text = userData["semester"].toString() ?? '';
-      });
-    } catch (e) {
-      print('Error fetching user profile: $e $authStatus');
-      // Handle error as needed
-    }
-  }
-
   Future<void> _loadUserProfile() async {
     try {
       final userData = await database.getCurrentUser();
-      print("userData");
-      print(userData);
+      print("load userData");
+      print(userData["preferences"]);
 
       setState(() {
         _nameController.text = userData["name"] ?? '';
@@ -85,8 +64,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _bioController.text = userData["bio"] ?? '';
         _courseController.text = userData["course"] ?? '';
         _ageController.text = userData["age"].toString() ?? '';
-        _preferencesController.text = userData["preferences"] ?? '';
         _semesterController.text = userData["semester"].toString() ?? '';
+        _preferencesController.text = userData["preferences"] ?? [];
+
       });
     } catch (e) {
       print('Error fetching user profile: $e $authStatus');
@@ -108,8 +88,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
           if (kDebugMode) {
             print('Invalid age format');
           }
-          // Handle the error or provide a default value for age
-          // For example, you can set age to a default value like 0
           age = userProfile?.age;
           semester = userProfile?.semester;
         }
@@ -120,15 +98,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
           bio: _bioController.text,
           course: _courseController.text,
           age: age,
-          preferences: selectedPreferences.join(', '), // or any other separator
-          semester: semester, // Convert to string before assigning
+          preferences: selectedPreferences.join(', '),
+          semester: semester,
         );
       }
     } catch (e) {
       if (kDebugMode) {
         print('Error updating user profile: $e');
       }
-      // Handle error as needed
     }
   }
 
