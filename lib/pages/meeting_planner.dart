@@ -252,7 +252,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
           score = score + 1;
         }
 
-        final search_profil =  await database.getUserProfile(); // uncommented: await database.getUserProfile(searchid: matcherid);
+        final search_profil =  await database.getUserProfile(searchid: matcherid);
         final my_profil =  await database.getUserProfile();
 
         if(major_search.isNotEmpty && major.text.isNotEmpty) {
@@ -330,7 +330,8 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
                         PageHeader(
                             title: 'Meeting planner',
                             backButton: false,
-                            headerHeight: 150),
+                            headerHeight: 150,
+                        ),
                         const SizedBox(height: 40),
                         Row(
                             mainAxisAlignment: MainAxisAlignment.center,

@@ -276,19 +276,20 @@ class DatabaseAPI {
 
 
 
-  Future<UserProfile?> getUserProfile() async {
+  Future<UserProfile?> getUserProfile({String? searchid=""}) async {
     try {
-      auth = AuthAPI();
-      await auth.loadUser();
       if (auth.userid == null) {
         print('User ID is null');
         return null;
+      }
+      if(searchid==""){
+        searchid = await auth.userid;
       }
       final response = await databases.listDocuments(
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_USERS,
         queries: [
-          Query.equal('user_id', [auth.userid!]),
+          Query.equal('user_id', [searchid!]),
         ],
       );
       if (response.documents.isNotEmpty) {
