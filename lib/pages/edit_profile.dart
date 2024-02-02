@@ -54,11 +54,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   ProfilePickLoad() async {
-    print("DEBUG1");
     XFile image =  await database.loadimage();
-    print("DEBUG2");
     if(image.toString().isNotEmpty){
-      print("DEBUG3");
       setState(() {
         _image = image;
       });
@@ -115,6 +112,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           preferences: selectedPreferences.join(', '),
           semester: semester,
         );
+        database.updateimage(_image!);
       }
     } catch (e) {
       if (kDebugMode) {

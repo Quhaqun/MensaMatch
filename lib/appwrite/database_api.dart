@@ -465,4 +465,16 @@ class DatabaseAPI {
     print(xfile.runtimeType);
     return xfile;
   }
+
+  updateimage(XFile xfile) async{
+    await auth.loadUser();
+    var pic_id = (await auth.userid)!;
+    var image = storage.getFile(bucketId: COLLECTION_Images, fileId: pic_id);
+    if (image != null) {
+      storage.deleteFile(bucketId: COLLECTION_Images, fileId: pic_id);
+    }
+    saveimage(image: xfile);
+  }
+
+
 }
