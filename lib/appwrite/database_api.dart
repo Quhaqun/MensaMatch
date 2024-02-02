@@ -1,5 +1,7 @@
 
+import 'dart:async';
 import 'dart:ffi' if (dart.library.html) 'dart:html' as html;
+import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:appwrite/appwrite.dart';
@@ -449,5 +451,18 @@ class DatabaseAPI {
         print("path, imageName or userid was null");
       }
     }
+  }
+
+  Future<XFile> loadimage({String pic_id=""}) async{
+    await auth.loadUser();
+    if(pic_id == ""){
+      pic_id = (await auth.userid)!;
+    }
+    Uint8List result = await storage.getFileDownload(bucketId:COLLECTION_Images, fileId: pic_id);
+    XFile xfile = XFile.fromData(result);
+    print("returned image is:");
+    print(xfile.path);
+    print(xfile.runtimeType);
+    return xfile;
   }
 }

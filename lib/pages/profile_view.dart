@@ -6,7 +6,7 @@ import 'package:mensa_match/components/bubble.dart';
 import 'package:mensa_match/pages/edit_profile.dart';
 import 'package:mensa_match/appwrite/database_api.dart';
 import 'package:provider/provider.dart';
-
+import 'package:mensa_match/components/image_picker.dart';
 import '../appwrite/auth_api.dart';  // Import your DatabaseAPI
 
 class Profile extends StatefulWidget {
@@ -30,6 +30,19 @@ class _ProfileState extends State<Profile> {
     final AuthAPI appwrite = context.read<AuthAPI>();
     authStatus = appwrite.status;
     appwrite.loadUser();
+    ProfilePickLoad();
+  }
+
+  ProfilePickLoad() async {
+    print("DEBUG1");
+    XFile image =  await database.loadimage();
+    print("DEBUG2");
+    if(image.toString().isNotEmpty){
+      print("DEBUG3");
+      setState(() {
+        _image = image;
+      });
+    }
   }
 
   Future<void> _loadUserData() async {
@@ -68,65 +81,14 @@ class _ProfileState extends State<Profile> {
                   children: [
                     // Top Image with Back and Edit Buttons
                     Container(
-                      height: MediaQuery.of(context).size.width, // Aspect ratio 1:1
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage('https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?cs=srgb&dl=pexels-andrea-piacquadio-774909.jpg&fm=jpg'),//userData["profile_picture"] ?? 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?cs=srgb&dl=pexels-andrea-piacquadio-774909.jpg&fm=jpg'), // Set image URL from user data
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      child: Stack(
-                        children: [
-                          // Back Button
-                          Positioned(
-                            top: 16.0,
-                            left: 16.0,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppColors.accentColor1,
-                              ),
-                              child: IconButton(
-                                padding: EdgeInsets.all(12.0),
-                                icon: Icon(
-                                  Icons.chevron_left,
-                                  color: AppColors.white,
-                                  size: 32,
-                                ),
-                                onPressed: () {
-                                  Navigator.pop(context); // Navigate back
-                                },
-                              ),
-                            ),
-                          ),
-                          // Edit Button (conditionally displayed)
-                          Positioned(
-                            top: 16.0,
-                            right: 16.0,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppColors.accentColor1,
-                              ),
-                              child: IconButton(
-                                padding: EdgeInsets.all(16.0),
-                                icon: Icon(
-                                  Icons.edit,
-                                  color: AppColors.white,
-                                  size: 24,
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => EditProfilePage(),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ],
+                      child: CircularImagePicker(
+                        image: _image,
+                        imageSize: 140,
+                        onImageSelected: (selectedImage) {
+                          setState(() {
+                            _image = selectedImage;
+                          });
+                        },
                       ),
                     ),
                     // Name and Subheadlines

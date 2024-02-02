@@ -44,12 +44,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _preferencesController = TextEditingController();
     _semesterController = TextEditingController();
     _loadUserProfile();
+    ProfilePickLoad();
 
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       final AuthAPI appwrite = context.read<AuthAPI>();
       authStatus = appwrite.status;
       appwrite.loadUser();
     });
+  }
+
+  ProfilePickLoad() async {
+    print("DEBUG1");
+    XFile image =  await database.loadimage();
+    print("DEBUG2");
+    if(image.toString().isNotEmpty){
+      print("DEBUG3");
+      setState(() {
+        _image = image;
+      });
+    }
   }
 
   Future<void> _loadUserProfile() async {
@@ -142,6 +155,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       Column(
                         children: [
                           CircularImagePicker(
+                              image: _image,
                               overlayText: 'Edit',
                               onImageSelected: (selectedImage) {
                                 setState(() {

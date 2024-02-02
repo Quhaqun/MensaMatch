@@ -7,9 +7,12 @@ class CircularImagePicker extends StatefulWidget {
   final Function(XFile?) onImageSelected;
   final String? overlayText;
   final double imageSize;
+  XFile? image = null;
 
-  const CircularImagePicker({
+
+  CircularImagePicker({
     Key? key,
+    this.image,
     required this.onImageSelected,
     this.imageSize = 180.0,
     this.overlayText,
@@ -20,7 +23,6 @@ class CircularImagePicker extends StatefulWidget {
 }
 
 class _CircularImagePickerState extends State<CircularImagePicker> {
-  XFile? _image;
   final ImagePicker picker = ImagePicker();
 
   @override
@@ -37,10 +39,10 @@ class _CircularImagePickerState extends State<CircularImagePicker> {
               shape: BoxShape.circle,
               color: Colors.grey[200], // Placeholder color
             ),
-            child: _image != null
+            child: widget.image != null
                 ? ClipOval(
                     child: Image.network(
-                      _image!.path,
+                      widget.image!.path,
                       width: widget.imageSize,
                       height: widget.imageSize,
                       fit: BoxFit.cover,
@@ -70,11 +72,12 @@ class _CircularImagePickerState extends State<CircularImagePicker> {
 
   Future<void> _pickImage() async {
     XFile? pickedImage = await picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      _image = pickedImage;
-    });
-
-    // Callback to notify the parent widget about the selected image
-    widget.onImageSelected(_image);
+    if(pickedImage != null){
+      setState(() {
+        widget.image = pickedImage;
+      });
+      // Callback to notify the parent widget about the selected image
+      widget.onImageSelected(widget.image);
+    }
   }
 }
