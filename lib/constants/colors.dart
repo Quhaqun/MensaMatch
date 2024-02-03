@@ -11,4 +11,5 @@ class AppColors {
   static const Color textColorDark = Color(0xFF181726);
   static const Color dangerColor = Color(0xFFFF2929);
   static const Color cardColor = Color(0xFFEDF0F3);
+  static const Color dividerGray = Color(0xFF6D7F94);
 }

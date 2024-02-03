@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mensa_match/constants/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mensa_match/pages/match_popup.dart';
 
 class HomeMeetingCard extends StatelessWidget {
   final String imageUrl;
@@ -18,60 +19,80 @@ class HomeMeetingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(right: 16.0),
-      padding: EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 70.0,
-            height: 70.0,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: NetworkImage(imageUrl),
-                fit: BoxFit.cover,
-              ),
-            ),
+    return GestureDetector(
+        onTap: () {
+          // Call the showDialog function to open the popup
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              // Create data object for popup
+              MatchPopupData data = MatchPopupData(
+                  image: 'https://i.redd.it/ai7vmpdlj5p91.png',
+                  name: 'Jennifer',
+                  age: 21,
+                  major: 'M. Sc. Computer Science',
+                  semester: 3,
+                  date: 'Today',
+                  time: time,
+                  location: location);
+              return MatchPopup(data: data);
+            },
+          );
+        },
+        child: Container(
+          margin: EdgeInsets.only(right: 16.0),
+          padding: EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: AppColors.cardColor,
+            borderRadius: BorderRadius.circular(10.0),
           ),
-          SizedBox(width: 16.0),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Row(
             children: [
-              Text(
-                name,
-                style: GoogleFonts.roboto(
-                  color: AppColors.textColorDark,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 20,
-                  height: 1.0,
+              Container(
+                width: 70.0,
+                height: 70.0,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: NetworkImage(imageUrl),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-              Text(
-                time,
-                style: GoogleFonts.roboto(
-                  color: AppColors.textColorDark,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 20,
-                ),
-              ),
-              Text(
-                location,
-                style: GoogleFonts.roboto(
-                  color: AppColors.textColorDark,
-                  fontWeight: FontWeight.w300,
-                  fontSize: 16,
-                ),
+              SizedBox(width: 16.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    name,
+                    style: GoogleFonts.roboto(
+                      color: AppColors.textColorDark,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 20,
+                      height: 1.0,
+                    ),
+                  ),
+                  Text(
+                    time,
+                    style: GoogleFonts.roboto(
+                      color: AppColors.textColorDark,
+                      fontWeight: FontWeight.w400,
+                      fontSize: 20,
+                    ),
+                  ),
+                  Text(
+                    location,
+                    style: GoogleFonts.roboto(
+                      color: AppColors.textColorDark,
+                      fontWeight: FontWeight.w300,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 }

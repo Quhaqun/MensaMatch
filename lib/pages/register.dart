@@ -1,7 +1,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:flutter/material.dart';
-import 'package:mensa_match/components/button_primary.dart';
+import 'package:mensa_match/components/button.dart';
 import 'package:mensa_match/components/input_textfield.dart';
 import 'package:mensa_match/components/wave_background.dart';
 import 'package:mensa_match/pages/login.dart';
