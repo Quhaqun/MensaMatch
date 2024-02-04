@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mensa_match/components/button_primary.dart';
+import 'package:mensa_match/components/button.dart';
 import 'package:mensa_match/constants/colors.dart';
 import 'package:mensa_match/components/wave_background.dart';
 import 'package:mensa_match/components/toolbar.dart';
