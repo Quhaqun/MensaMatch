@@ -1,200 +1,171 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mensa_match/constants/colors.dart';
 import 'package:mensa_match/components/bubble.dart';
 import 'package:mensa_match/pages/edit_profile.dart';
+import 'package:mensa_match/appwrite/database_api.dart';
+import 'package:provider/provider.dart';
+import 'package:mensa_match/components/image_picker.dart';
+import '../appwrite/auth_api.dart';  // Import your DatabaseAPI
 
-class Profile extends StatelessWidget {
-  final String imageUrl;
-  final String name;
-  final int age;
-  final String major;
-  final String semester;
-  final String bio;
-  final bool showEditButton;
+class Profile extends StatefulWidget {
+  const Profile({Key? key}) : super(key: key);
 
-  const Profile({
-    // TODO: insert 'required' and remove placeholder values as soon as data is oaded from database
-    Key? key,
-    this.imageUrl =
-        'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?cs=srgb&dl=pexels-andrea-piacquadio-774909.jpg&fm=jpg', // Placeholder image URL
-    this.name = 'John Doe', // Placeholder name
-    this.age = 25,
-    this.major = 'M. Sc. Computer Science',
-    this.semester = '3rd Semester',
-    this.bio =
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', // Placeholder bio
-    this.showEditButton = true,
-  }) : super(key: key);
+  @override
+  _ProfileState createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  final DatabaseAPI database = DatabaseAPI();
+  XFile? _image = null;
+  late Map<String, dynamic> userData;  // Store user data here
+  AuthStatus authStatus = AuthStatus.uninitialized;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+    final AuthAPI appwrite = context.read<AuthAPI>();
+    authStatus = appwrite.status;
+    appwrite.loadUser();
+    ProfilePickLoad();
+  }
+
+  ProfilePickLoad() async {
+    print("DEBUG1");
+    XFile image =  await database.loadimage();
+    print("DEBUG2");
+    if(image.toString().isNotEmpty){
+      print("DEBUG3");
+      setState(() {
+        _image = image;
+      });
+    }
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      final loadedUserData = await database.getCurrentUser();
+      print("userData");
+      print(loadedUserData);
+
+      setState(() {
+        userData = loadedUserData;  // Set instance variable
+        isLoading = false;  // Set isLoading to false after loading data
+      });
+    } catch (e) {
+      print('Error fetching user profile: $e $authStatus');
+      // Handle error as needed
+      setState(() {
+        isLoading = false;  // Set isLoading to false even if there's an error
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<String> availableOptions = [
-      'Tennis',
-      'Gym',
-      'Programming',
-      'Dogs',
-      'Photography',
-      'Nature',
-      'Travelling',
-      'Cooking',
-      'Environmentalism'
-    ];
-
-    List<String> selectedOptions = [
-      'Tennis',
-      'Programming',
-      'Travelling',
-    ];
-
-    return Scaffold(
+    return isLoading
+        ? CircularProgressIndicator()  // Show a loading indicator while data is being fetched
+        : Scaffold(
       backgroundColor: AppColors.backgroundColorLight,
-      body: LayoutBuilder(builder: (context, constraints) {
-        return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: IntrinsicHeight(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Top Image with Back and Edit Buttons
-                  Container(
-                    height:
-                        MediaQuery.of(context).size.width, // Aspect ratio 1:1
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(imageUrl), // Set image URL
-                        fit: BoxFit.cover,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Top Image with Back and Edit Buttons
+                    Container(
+                      child: CircularImagePicker(
+                        image: _image,
+                        imageSize: 140,
+                        onImageSelected: (selectedImage) {
+                          setState(() {
+                            _image = selectedImage;
+                          });
+                        },
                       ),
                     ),
-                    child: Stack(
-                      children: [
-                        // Back Button
-                        Positioned(
-                          top: 16.0,
-                          left: 16.0,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.accentColor1,
-                            ),
-                            child: IconButton(
-                              padding: EdgeInsets.all(12.0),
-                              icon: Icon(
-                                Icons.chevron_left,
-                                color: AppColors.white,
-                                size: 32,
-                              ),
-                              onPressed: () {
-                                Navigator.pop(context); // Navigate back
-                              },
+                    // Name and Subheadlines
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Replace these lines in the build method of the Profile widget
+                          Text(
+                            '${userData["name"]}, ${userData["age"].toString()}',
+                            style: GoogleFonts.roboto(
+                              color: AppColors.textColorDark,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 32,
                             ),
                           ),
-                        ),
-                        // Edit Button (conditionally displayed)
-                        if (showEditButton)
-                          Positioned(
-                            top: 16.0,
-                            right: 16.0,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppColors.accentColor1,
-                              ),
-                              child: IconButton(
-                                padding: EdgeInsets.all(16.0),
-                                icon: Icon(
-                                  Icons.edit,
-                                  color: AppColors.white,
-                                  size: 24,
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              EditProfilePage()));
-                                },
-                              ),
+                          Text(
+                            userData["course"] ?? "",  // Use the null-aware operator and provide a default value
+                            style: GoogleFonts.roboto(
+                              color: AppColors.textColorGray,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 20,
                             ),
                           ),
-                      ],
-                    ),
-                  ),
-                  // Name and Subheadlines
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '$name, $age',
-                          style: GoogleFonts.roboto(
-                            color: AppColors.textColorDark,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 32,
+                          Text(
+                            userData["semester"].toString() ?? "",  // Use the null-aware operator and provide a default value
+                            style: GoogleFonts.roboto(
+                              color: AppColors.textColorGray,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 16,
+                            ),
                           ),
-                        ),
-                        Text(
-                          major,
-                          style: GoogleFonts.roboto(
-                            color: AppColors.textColorGray,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 20,
-                          ),
-                        ),
-                        Text(
-                          semester,
-                          style: GoogleFonts.roboto(
-                            color: AppColors.textColorGray,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Bio Text
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      bio,
-                      style: GoogleFonts.roboto(
-                        color: AppColors.textColorGray,
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16,
+                        ],
                       ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Padding(
+                    // Bio Text
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                        userData["bio"] ?? "",
+                        style: GoogleFonts.roboto(
+                          color: AppColors.textColorGray,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Interests',
-                              style: GoogleFonts.roboto(
-                                color: AppColors.textColorGray,
-                                fontWeight: FontWeight.w400,
-                                fontSize: 20,
-                              ),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Interests',
+                            style: GoogleFonts.roboto(
+                              color: AppColors.textColorGray,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 20,
                             ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            ReadOnlyBubbleList(
-                                availableOptions: availableOptions,
-                                selectedOptions: selectedOptions)
-                          ])),
-                ],
+                          ),
+                          const SizedBox(height: 10),
+                          ReadOnlyBubbleList(
+                            availableOptions: (userData["preferences"] as List<String>?) ?? [],
+                            selectedOptions: (userData["selectedPreferences"] as List<String>?) ?? [],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 }

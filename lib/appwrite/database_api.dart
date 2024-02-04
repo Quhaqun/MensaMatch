@@ -1,5 +1,7 @@
 
+import 'dart:async';
 import 'dart:ffi' if (dart.library.html) 'dart:html' as html;
+import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:appwrite/appwrite.dart';
@@ -163,8 +165,9 @@ class DatabaseAPI {
           'age': 0,
           'semester': 0,
           'bio': "",
-          'preferences': "",
-          'user_id': auth.userid
+          'preferences': [], // Change here
+          'user_id': auth.userid,
+          'profile_picture': "",
         },
       );
     } else {
@@ -195,8 +198,6 @@ class DatabaseAPI {
           Query.equal("user_id", [auth.userid]),
         ],
       );
-      print("name of user");
-      print(existingUserProfile?.name);
       var docId = filteredUser.documents.first.$id;
 
       final Map<String, dynamic> updateData = {};
@@ -232,25 +233,25 @@ class DatabaseAPI {
     }
   }
 
-  void _updateField(Map<String, dynamic> updateData, String fieldName, String? newValue, String? oldValue) {
-    print("old value");
-    print(oldValue);
-    print("new Value");
-    print(newValue);
-    if (newValue != null && newValue.isNotEmpty) {
-      print("it is: ");
-      print(newValue);
-      updateData[fieldName] = newValue;
-    } else if (oldValue != null && oldValue.isNotEmpty) {
+  void _updateField(Map<String, dynamic> updateData, String fieldName, dynamic newValue, dynamic oldValue) {
+
+    if (newValue != null) {
+      if (newValue is int) {
+        updateData[fieldName] = newValue.toString();
+      } else if (newValue is List && newValue.isNotEmpty) {
+        updateData[fieldName] = newValue;
+      } else if (newValue is String && newValue.isNotEmpty) {
+        updateData[fieldName] = newValue;
+      }
+    } else if (oldValue != null && oldValue is String && oldValue.isNotEmpty) {
       updateData[fieldName] = oldValue;
-      print("it is: ");
-      print(oldValue);
     }
   }
 
   Future<Map<String, dynamic>> getCurrentUser() async {
     auth = AuthAPI();
     await auth.loadUser();
+
     final user = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_USERS,
@@ -262,15 +263,37 @@ class DatabaseAPI {
     if (user.documents.isNotEmpty) {
       try {
         final userDataMap = user.documents.first.data;
-        return userDataMap;
+
+        final name = userDataMap['name'] as String? ?? '';
+        final email = userDataMap['email'] as String? ?? '';
+        final bio = userDataMap['bio'] as String? ?? '';
+        final course = userDataMap['course'] as String? ?? '';
+        final age = userDataMap['age'] as int? ?? 0;
+        final semester = userDataMap['semester'] as int? ?? 0;
+        final profile_picture = userDataMap['profile_picture'] as String? ?? '';
+
+        print("current user preferences");
+        print(userDataMap['preferences']);
+        // Handle the comma-separated string for preferences
+        final preferencesString = userDataMap['preferences'] as String? ?? '';
+        final preferences = preferencesString.split(',').map((e) => e.trim()).toList();
+        print(preferences);
+        return {
+          'name': name,
+          'email': email,
+          'bio': bio,
+          'course': course,
+          'age': age,
+          'semester': semester,
+          'preferences': preferences,
+          'profile_picture': profile_picture,
+        };
       } catch (e) {
         print("Error retrieving user data: $e");
         return {};
       }
     } else {
-      // Handle the case when the document is not found
-      // For example, return an empty Map or throw an exception
-      return {};
+      return {}; // Return empty map if user document is not found
     }
   }
 
@@ -295,6 +318,8 @@ class DatabaseAPI {
       if (response.documents.isNotEmpty) {
         try {
           final userDataMap = response.documents.first.data;
+          print("preferences");
+          print(userDataMap["preferences"]);
           final userProfile = UserProfile(
               name: userDataMap['name'],
               course: userDataMap['course'],
@@ -302,6 +327,7 @@ class DatabaseAPI {
               age: userDataMap['age'] as int,
               bio: userDataMap['bio'],
               preferences: userDataMap['preferences'],
+              semester: userDataMap['semester'] as int,
               user_id: userDataMap['user_id']
           );
           return userProfile;
@@ -310,9 +336,7 @@ class DatabaseAPI {
           return null;
         }
       } else {
-        // Handle the case when the document is not found
-        // For example, return an empty UserProfile or throw an exception
-        return null; // Replace this with your desired behavior
+        return null;
       }
     }
     catch(e){
@@ -340,6 +364,8 @@ class DatabaseAPI {
   }
 
   Future<DocumentList> getMatches() async {
+    auth = AuthAPI();
+    await auth.loadUser();
     final userMatches = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MATCH,
@@ -427,4 +453,29 @@ class DatabaseAPI {
       }
     }
   }
+
+  Future<XFile> loadimage({String pic_id=""}) async{
+    await auth.loadUser();
+    if(pic_id == ""){
+      pic_id = (await auth.userid)!;
+    }
+    Uint8List result = await storage.getFileDownload(bucketId:COLLECTION_Images, fileId: pic_id);
+    XFile xfile = XFile.fromData(result);
+    print("returned image is:");
+    print(xfile.path);
+    print(xfile.runtimeType);
+    return xfile;
+  }
+
+  updateimage(XFile xfile) async{
+    await auth.loadUser();
+    var pic_id = (await auth.userid)!;
+    var image = storage.getFile(bucketId: COLLECTION_Images, fileId: pic_id);
+    if (image != null) {
+      storage.deleteFile(bucketId: COLLECTION_Images, fileId: pic_id);
+    }
+    saveimage(image: xfile);
+  }
+
+
 }

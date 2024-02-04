@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:provider/provider.dart';
@@ -42,8 +43,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _ageController = TextEditingController();
     _preferencesController = TextEditingController();
     _semesterController = TextEditingController();
-    //_initProfile();
-    _loadUserProfile(); // Call _loadUserProfile here directly
+    _loadUserProfile();
+    ProfilePickLoad();
 
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       final AuthAPI appwrite = context.read<AuthAPI>();
@@ -52,33 +53,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
     });
   }
 
-
-  Future<void> _initProfile() async {
-    try {
-      final userData = await database.getCurrentUser();
-      print("userData");
-      print(userData);
-
+  ProfilePickLoad() async {
+    XFile image =  await database.loadimage();
+    if(image.toString().isNotEmpty){
       setState(() {
-        _nameController.text = userData["name"] ?? '';
-        _emailController.text = userData["email"]  ?? '';
-        _bioController.text = userData["bio"] ?? '';
-        _courseController.text = userData["course"] ?? '';
-        _ageController.text = userData["age"].toString() ?? '';
-        _preferencesController.text = userData["preferences"] ?? '';
-        _semesterController.text = userData["semester"] ?? '';
+        _image = image;
       });
-    } catch (e) {
-      print('Error fetching user profile: $e $authStatus');
-      // Handle error as needed
     }
   }
 
   Future<void> _loadUserProfile() async {
     try {
       final userData = await database.getCurrentUser();
-      print("userData");
-      print(userData);
+      print("load userData");
+      print(userData["preferences"]);
 
       setState(() {
         _nameController.text = userData["name"] ?? '';
@@ -86,8 +74,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _bioController.text = userData["bio"] ?? '';
         _courseController.text = userData["course"] ?? '';
         _ageController.text = userData["age"].toString() ?? '';
-        _preferencesController.text = userData["preferences"] ?? '';
-        _semesterController.text = userData["semester"] ?? '';
+        _semesterController.text = userData["semester"].toString() ?? '';
+        _preferencesController.text = userData["preferences"]?.join(', ') ?? '';
+
+
       });
     } catch (e) {
       print('Error fetching user profile: $e $authStatus');
@@ -106,9 +96,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
           semester = _semesterController.text.isNotEmpty ? int.parse(_semesterController.text) : null;
           age = _ageController.text.isNotEmpty ? int.parse(_ageController.text) : null;
         } catch (e) {
-          print('Invalid age format');
-          // Handle the error or provide a default value for age
-          // For example, you can set age to a default value like 0
+          if (kDebugMode) {
+            print('Invalid age format');
+          }
           age = userProfile?.age;
           semester = userProfile?.semester;
         }
@@ -119,13 +109,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
           bio: _bioController.text,
           course: _courseController.text,
           age: age,
-          preferences: _preferencesController.text,
-          semester: semester
+          preferences: selectedPreferences.join(', '),
+          semester: semester,
         );
+        database.updateimage(_image!);
       }
     } catch (e) {
-      print('Error updating user profile: $e');
-      // Handle error as needed
+      if (kDebugMode) {
+        print('Error updating user profile: $e');
+      }
     }
   }
 
@@ -161,6 +153,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       Column(
                         children: [
                           CircularImagePicker(
+                              image: _image,
                               overlayText: 'Edit',
                               onImageSelected: (selectedImage) {
                                 setState(() {
@@ -199,20 +192,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               maxLines: 4),
                           const SizedBox(height: 20),
                           MultiSelectBubbleList(
-                              options: const [
-                                'Tennis',
-                                'Gym',
-                                'Programming',
-                                'Dogs',
-                                'Photography',
-                                'Nature',
-                                'Travelling',
-                                'Cooking',
-                                'Environmentalism'
-                              ],
-                              onSelectionChanged: (onSelectionChanged) {
+                            options: const [
+                              'Tennis',
+                              'Gym',
+                              'Programming',
+                              'Dogs',
+                              'Photography',
+                              'Nature',
+                              'Travelling',
+                              'Cooking',
+                              'Environmentalism'
+                            ],
+                            onSelectionChanged: (onSelectionChanged) {
+                              setState(() {
                                 selectedPreferences = onSelectionChanged;
-                              }),
+                              });
+                            },
+                          ),
                           const SizedBox(height: 10),
                           button_primary(
                               buttonText: 'Save',
