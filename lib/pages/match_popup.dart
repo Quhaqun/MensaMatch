@@ -92,7 +92,7 @@ class MatchPopup extends StatelessWidget {
                         ),
                         SizedBox(height: 16),
                         Text(
-                          '${data.name}, ${data.age}',
+                          '${data.name} (${data.age})',
                           style: GoogleFonts.roboto(
                             color: AppColors.textColorDark,
                             fontWeight: FontWeight.w700,

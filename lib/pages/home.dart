@@ -73,7 +73,7 @@ class _HomeState extends State<Home> {
         image: 'https://i.redd.it/ai7vmpdlj5p91.png',
         name: 'Jennifer',
         age: 21,
-        major: 'M. Sc. Computer Science',
+        major: 'M.Sc. Computer Science',
         semester: 3,
         date: 'Today',
         time: '12.00 Uhr',
