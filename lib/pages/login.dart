@@ -145,6 +145,7 @@ class _LoginPageState extends State<LoginPage> {
                               controller: passwordTextController,
                               labelText: "Password"),
                           // Sign In button
+                          SizedBox(height: 20),
                           button_primary(
                               buttonText: "Sign In", onPressed: signIn),
                           // OR
