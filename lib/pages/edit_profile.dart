@@ -11,6 +11,7 @@ import 'package:mensa_match/components/page_header.dart';
 import 'package:mensa_match/components/bubble.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mensa_match/components/image_picker.dart';
+import 'package:mensa_match/constants/interests.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({Key? key}) : super(key: key);
@@ -69,13 +70,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
       print(userData["preferences"]);
 
       setState(() {
-        _nameController.text = userData["name"] ?? '';
-        _emailController.text = userData["email"]  ?? '';
-        _bioController.text = userData["bio"] ?? '';
-        _courseController.text = userData["course"] ?? '';
-        _ageController.text = userData["age"].toString() ?? '';
-        _semesterController.text = userData["semester"].toString() ?? '';
-        _preferencesController.text = userData["preferences"]?.join(', ') ?? '';
+        _nameController.text = userData["name"] ?? 'null';
+        _emailController.text = userData["email"]  ?? 'null';
+        _bioController.text = userData["bio"] ?? 'null';
+        _courseController.text = userData["course"] ?? 'null';
+        _ageController.text = userData["age"].toString();
+        _semesterController.text = userData["semester"].toString();
+        _preferencesController.text = userData["preferences"]?.join(', ') ?? [];
 
 
       });
@@ -192,17 +193,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               maxLines: 4),
                           const SizedBox(height: 20),
                           MultiSelectBubbleList(
-                            options: const [
-                              'Tennis',
-                              'Gym',
-                              'Programming',
-                              'Dogs',
-                              'Photography',
-                              'Nature',
-                              'Travelling',
-                              'Cooking',
-                              'Environmentalism'
-                            ],
+                            options: Interests.availableOptions,
                             onSelectionChanged: (onSelectionChanged) {
                               setState(() {
                                 selectedPreferences = onSelectionChanged;

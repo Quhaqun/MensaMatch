@@ -185,7 +185,11 @@ class MatchPopup extends StatelessWidget {
 }
 
 
-String getSemesterString(int semester) {
+String getSemesterString(int? semester) {
+  if (semester == null) {
+    return 'Unknown';
+  }
+
   if (semester >= 11 && semester <= 13) {
     return '$semester' 'th';
   }
