@@ -13,6 +13,7 @@ import 'package:mensa_match/pages/meeting_planner.dart';
 import 'package:mensa_match/appwrite/database_api.dart';
 import 'package:appwrite/models.dart';
 import 'package:flutter/services.dart';
+import 'package:mensa_match/pages/match_popup.dart';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
@@ -67,6 +68,17 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    // example data
+    MatchPopupData popupData = MatchPopupData(
+        image: 'https://i.redd.it/ai7vmpdlj5p91.png',
+        name: 'Jennifer',
+        age: 21,
+        major: 'M. Sc. Computer Science',
+        semester: 3,
+        date: 'Today',
+        time: '12.00 Uhr',
+        location: 'Skyline Mensa');
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColorLight,
       body: LayoutBuilder(builder: (context, constraints) {
@@ -110,7 +122,9 @@ class _HomeState extends State<Home> {
                                   time:
                                       '${match.data.values.elementAt(5)}:${match.data.values.elementAt(6)} Uhr', // Assuming the data structure contains hour and minute fields
                                   location: match.data.values.elementAt(
-                                      1), // Update with the correct index for location
+                                      1,
+                                      ),
+                                      popupData: popupData, // Update with the correct index for location
                                 );
                               },
                             ),
@@ -129,25 +143,28 @@ class _HomeState extends State<Home> {
                             height: 120.0,
                             child: ListView(
                               scrollDirection: Axis.horizontal,
-                              children: const [
+                              children: [
                                 HomeMeetingCard(
                                     imageUrl:
                                         'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
                                     name: 'Lara',
                                     time: '12:00 Uhr',
-                                    location: 'Skyline Mensa'),
+                                    location: 'Skyline Mensa',
+                                    popupData: popupData),
                                 HomeMeetingCard(
                                     imageUrl:
                                         'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
                                     name: 'Lara',
                                     time: '12:00 Uhr',
-                                    location: 'Skyline Mensa'),
+                                    location: 'Skyline Mensa',
+                                    popupData: popupData),
                                 HomeMeetingCard(
                                     imageUrl:
                                         'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
                                     name: 'Lara',
                                     time: '12:00 Uhr',
-                                    location: 'Skyline Mensa')
+                                    location: 'Skyline Mensa',
+                                    popupData: popupData)
                               ],
                             ),
                           ),

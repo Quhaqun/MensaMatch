@@ -8,6 +8,7 @@ class HomeMeetingCard extends StatelessWidget {
   final String name;
   final String time;
   final String location;
+  final MatchPopupData popupData;
 
   const HomeMeetingCard({
     Key? key,
@@ -15,6 +16,7 @@ class HomeMeetingCard extends StatelessWidget {
     required this.name,
     required this.time,
     required this.location,
+    required this.popupData
   }) : super(key: key);
 
   @override
@@ -25,17 +27,7 @@ class HomeMeetingCard extends StatelessWidget {
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              // Create data object for popup
-              MatchPopupData data = MatchPopupData(
-                  image: 'https://i.redd.it/ai7vmpdlj5p91.png',
-                  name: 'Jennifer',
-                  age: 21,
-                  major: 'M. Sc. Computer Science',
-                  semester: 3,
-                  date: 'Today',
-                  time: time,
-                  location: location);
-              return MatchPopup(data: data);
+              return MatchPopup(data: popupData);
             },
           );
         },
