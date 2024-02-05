@@ -1,6 +1,7 @@
 
 import 'dart:async';
 import 'dart:ffi' if (dart.library.html) 'dart:html' as html;
+import 'dart:html';
 import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -38,6 +39,10 @@ class DatabaseAPI {
   Future<DocumentList> getMessages({String matched_user_id=""}) async {
     auth = AuthAPI();
     await auth.loadUser();
+    print("userid");
+    print(auth.userid);
+    print("matched_user_id");
+    print(matched_user_id);
     final userMessages = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MESSAGES,
@@ -46,7 +51,8 @@ class DatabaseAPI {
         Query.equal("reciever_id", [matched_user_id])
       ],
     );
-
+    print("userMessages");
+    print(userMessages);
     final recieverMessages = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MESSAGES,
@@ -55,26 +61,32 @@ class DatabaseAPI {
         Query.equal("user_id", [matched_user_id]),
       ],
     );
-
+    print("2");
+    print("recieverMessages");
+    print(recieverMessages.documents);
     // Combine the results of both requests
     final List<Document> combinedMessages = [
       ...userMessages.documents,
       ...recieverMessages.documents,
     ];
 
+    print("3");
+    print("combinedMessages");
+    print(combinedMessages);
     // Sort the combined messages by timestamp
     combinedMessages.sort((a, b) {
       final timestampA = DateTime.parse(a.data['timestamp']);
       final timestampB = DateTime.parse(b.data['timestamp']);
       return timestampA.compareTo(timestampB); // Sort in ascending order
     });
-
+    print("4");
     // Create a DocumentList with the combined and sorted messages
     final documentList = DocumentList(
       documents: combinedMessages,
       total: combinedMessages.length,
     );
-
+    print("documentList");
+    print(documentList);
     return documentList;
   }
 
@@ -251,6 +263,39 @@ class DatabaseAPI {
       updateData[fieldName] = oldValue;
     }
   }
+  Future<Map<String, dynamic>> getUser({required String searchid}) async {
+    auth = AuthAPI();
+    await auth.loadUser();
+
+    final user = await databases.listDocuments(
+      databaseId: APPWRITE_DATABASE_ID,
+      collectionId: COLLECTION_USERS,
+      queries: [
+        Query.equal("user_id", [searchid]),
+      ],
+    );
+
+    if (user.documents.isNotEmpty) {
+      try {
+        final userDataMap = user.documents.first.data;
+
+        final name = userDataMap['name'] as String? ?? '';
+        final age = userDataMap['age'] as int? ?? 0;
+        final profile_picture = userDataMap['profile_picture'] as String? ?? '';
+
+        return {
+          'name': name,
+          'age': age,
+          'profile_picture': profile_picture,
+        };
+      } catch (e) {
+        print("Error retrieving user data: $e");
+        return {};
+      }
+    } else {
+      return {}; // Return empty map if user document is not found
+    }
+  }
 
   Future<Map<String, dynamic>> getCurrentUser() async {
     auth = AuthAPI();
@@ -385,6 +430,8 @@ class DatabaseAPI {
   Future<DocumentList> getFoundMatches() async{
     auth = AuthAPI();
     await auth.loadUser();
+    print("useerid foundMatches");
+    print(auth.userid);
     final userMatches = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MATCH,
@@ -393,8 +440,6 @@ class DatabaseAPI {
         Query.notEqual("matcher_id", ["empty"])
       ],
     );
-    print("userMatches");
-    print(userMatches.documents.first.data["name"]);
 
     final reciverMatches = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
@@ -417,7 +462,7 @@ class DatabaseAPI {
     );
 
     print("found matches");
-    print(documentList.documents.first.data);
+    print(documentList.documents.last.data["name"]);
 
     return documentList;
   }

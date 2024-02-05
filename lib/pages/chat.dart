@@ -3,7 +3,6 @@ import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:mensa_match/appwrite/database_api.dart';
 import 'package:flutter/material.dart';
 import 'package:appwrite/models.dart';
-import 'package:mensa_match/pages/user_profile.dart';
 import 'package:provider/provider.dart';
 import 'package:mensa_match/pages/match_popup.dart';
 
@@ -18,6 +17,7 @@ class MessagesPage extends StatefulWidget {
 
 class _MessagesPageState extends State<MessagesPage> {
   final database = DatabaseAPI();
+  final appwrite  = AuthAPI();
   late List<Document>? messages = [];
   TextEditingController messageTextController = TextEditingController();
   AuthStatus authStatus = AuthStatus.uninitialized;
@@ -33,7 +33,10 @@ class _MessagesPageState extends State<MessagesPage> {
 
   loadMessages() async {
     try {
+      await appwrite.loadUser();
       final value = await database.getMessages(matched_user_id: widget.match_id);
+      print("value");
+      print(value.documents);
       setState(() {
         messages = value.documents;
       });
@@ -42,15 +45,26 @@ class _MessagesPageState extends State<MessagesPage> {
     }
   }
 
-  Future<UserProfile?> getUser() async {
-    try{
-      UserProfile? userProfile = await database.getUserProfile(searchid: widget.match_id);
-      return userProfile;
-    }
-    catch(e){
+  Future<Map<String, dynamic>> getUser() async {
+    try {
+      Map<String, dynamic> userData = await database.getUser(searchid: widget.match_id);
+
+      // Extract specific fields from userData
+      final name = userData['name'] as String? ?? '';
+      final age = userData['age'] as int? ?? 0;
+      final profilePicture = 'https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png';
+
+      // Return a Map with the extracted values
+      return {
+        'name': name,
+        'age': age,
+        'profile_picture': profilePicture,
+      };
+    } catch (e) {
       print("Error in getUser(): $e");
+      // Throw an exception or return an empty Map based on your requirement
+      throw Exception("Failed to fetch user data");
     }
-    return null;
   }
 
   addMessage() async {
@@ -109,7 +123,7 @@ class _MessagesPageState extends State<MessagesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: FutureBuilder<UserProfile?>(
+        title: FutureBuilder<Map<String, dynamic>>(
           future: getUser(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -117,15 +131,15 @@ class _MessagesPageState extends State<MessagesPage> {
             } else if (snapshot.hasError) {
               return Text("Error: ${snapshot.error}");
             } else {
-              final userProfile = snapshot.data;
+              final userMap = snapshot.data;
 
               return Row(
                 children: [
                   CircleAvatar(
-                    backgroundImage: NetworkImage('https://media.istockphoto.com/id/1311084168/de/foto/überglückliche-hübsche-asiatische-frau-schauen-in-die-kamera-mit-aufrichtigem-lachen.jpg?s=1024x1024&w=is&k=20&c=aisZW0UJ3xdP3sm1ieGsk3rLA_1zZ0qG1GxkH-vaJ5g='), // Provide a default image URL
+                    backgroundImage: NetworkImage('https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png'),
                   ),
                   const SizedBox(width: 8.0),
-                  Text(userProfile?.name ?? "User Name"), // Provide a default user name
+                  Text(userMap?['name'] ?? "User Name"),
                 ],
               );
             }

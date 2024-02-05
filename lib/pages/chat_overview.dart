@@ -24,6 +24,7 @@ class ChatOverview extends StatefulWidget {
 class _ChatOverviewState extends State<ChatOverview> {
   int _selectedIndex = 0;
   late List<Document>? matches = [];
+  final appwrite  = AuthAPI();
   final database = DatabaseAPI();
   XFile? _image = null;
   AuthStatus authStatus = AuthStatus.uninitialized;
@@ -59,12 +60,35 @@ class _ChatOverviewState extends State<ChatOverview> {
 
   loadFoundMatches() async {
     try {
+      await appwrite.loadUser();
       final value = await database.getFoundMatches();
       setState(() {
         matches = value.documents;
       });
     } catch (e) {
       print("Error in loadFoundMatches(): $e");
+    }
+  }
+
+  Future<Map<String, dynamic>> getUser(String match_id) async {
+    try {
+      Map<String, dynamic> userData = await database.getUser(searchid: match_id);
+
+      // Extract specific fields from userData
+      final name = userData['name'] as String? ?? '';
+      final age = userData['age'] as int? ?? 0;
+      final profilePicture = 'https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png';
+
+      // Return a Map with the extracted values
+      return {
+        'name': name,
+        'age': age,
+        'profile_picture': profilePicture,
+      };
+    } catch (e) {
+      print("Error in getUser(): $e");
+      // Throw an exception or return an empty Map based on your requirement
+      throw Exception("Failed to fetch user data");
     }
   }
 
@@ -161,23 +185,35 @@ Widget _buildSearchBar() {
             itemCount: matches.length,
             itemBuilder: (context, index) {
               final match = matches[index];
-              return GestureDetector(
-                onTap: () {
-                  // Open MessagesPage with the selected user's data
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MessagesPage(match_id: match.data["matcher_id"],
+              return FutureBuilder<Map<String, dynamic>>(
+                future: getUser(match.data["matcher_id"]),
+                builder: (context, userSnapshot) {
+                  if (userSnapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (userSnapshot.hasError) {
+                    return Text("Error: ${userSnapshot.error}");
+                  } else {
+                    final userData = userSnapshot.data;
+
+                    return GestureDetector(
+                      onTap: () {
+                        // Open MessagesPage with the selected user's data
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MessagesPage(match_id: match.data["matcher_id"]),
+                          ),
+                        );
+                      },
+                      child: chatOverviewElement(
+                        image: 'https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png',
+                        name: userData?['name'] ?? 'Unknown',
+                        message_preview: 'Latest message preview',
+                        match_id: match.data["matcher_id"],
                       ),
-                    ),
-                  );
+                    );
+                  }
                 },
-                child: chatOverviewElement(
-                  image: 'https://media.istockphoto.com/id/1311084168/de/foto/überglückliche-hübsche-asiatische-frau-schauen-in-die-kamera-mit-aufrichtigem-lachen.jpg?s=1024x1024&w=is&k=20&c=aisZW0UJ3xdP3sm1ieGsk3rLA_1zZ0qG1GxkH-vaJ5g=',
-                  name: match.data.values.elementAt(0) ?? 'Unknown',
-                  message_preview: 'Latest message preview',
-                  match_id: match.data["matcher_id"],
-                ),
               );
             },
           );
