@@ -3,10 +3,14 @@ import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:mensa_match/appwrite/database_api.dart';
 import 'package:flutter/material.dart';
 import 'package:appwrite/models.dart';
+import 'package:mensa_match/pages/user_profile.dart';
 import 'package:provider/provider.dart';
+import 'package:mensa_match/pages/match_popup.dart';
 
 class MessagesPage extends StatefulWidget {
-  const MessagesPage({Key? key}) : super(key: key);
+  final String match_id;
+
+  const MessagesPage({Key? key, required this.match_id}) : super(key: key);
 
   @override
   _MessagesPageState createState() => _MessagesPageState();
@@ -24,17 +28,29 @@ class _MessagesPageState extends State<MessagesPage> {
     final AuthAPI appwrite = context.read<AuthAPI>();
     authStatus = appwrite.status;
     loadMessages();
+    getUser();
   }
 
   loadMessages() async {
     try {
-      final value = await database.getMessages();
+      final value = await database.getMessages(matched_user_id: widget.match_id);
       setState(() {
         messages = value.documents;
       });
     } catch (e) {
       print("Error in loadMessages(): $e");
     }
+  }
+
+  Future<UserProfile?> getUser() async {
+    try{
+      UserProfile? userProfile = await database.getUserProfile(searchid: widget.match_id);
+      return userProfile;
+    }
+    catch(e){
+      print("Error in getUser(): $e");
+    }
+    return null;
   }
 
   addMessage() async {
@@ -93,14 +109,27 @@ class _MessagesPageState extends State<MessagesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage('https://example.com/placeholder_image.jpg'),
-            ),
-            const SizedBox(width: 8.0),
-            Text('Jonas'),
-          ],
+        title: FutureBuilder<UserProfile?>(
+          future: getUser(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text("Error: ${snapshot.error}");
+            } else {
+              final userProfile = snapshot.data;
+
+              return Row(
+                children: [
+                  CircleAvatar(
+                    backgroundImage: NetworkImage('https://media.istockphoto.com/id/1311084168/de/foto/überglückliche-hübsche-asiatische-frau-schauen-in-die-kamera-mit-aufrichtigem-lachen.jpg?s=1024x1024&w=is&k=20&c=aisZW0UJ3xdP3sm1ieGsk3rLA_1zZ0qG1GxkH-vaJ5g='), // Provide a default image URL
+                  ),
+                  const SizedBox(width: 8.0),
+                  Text(userProfile?.name ?? "User Name"), // Provide a default user name
+                ],
+              );
+            }
+          },
         ),
         actions: [
           IconButton(

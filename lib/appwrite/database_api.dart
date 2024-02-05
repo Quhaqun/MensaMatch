@@ -35,12 +35,15 @@ class DatabaseAPI {
     storage = new Storage(client);
   }
 
-  Future<DocumentList> getMessages() async {
+  Future<DocumentList> getMessages({String matched_user_id=""}) async {
+    auth = AuthAPI();
+    await auth.loadUser();
     final userMessages = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MESSAGES,
       queries: [
         Query.equal("user_id", [auth.userid]),
+        Query.equal("reciever_id", [matched_user_id])
       ],
     );
 
@@ -49,6 +52,7 @@ class DatabaseAPI {
       collectionId: COLLECTION_MESSAGES,
       queries: [
         Query.equal("reciever_id", [auth.userid]),
+        Query.equal("user_id", [matched_user_id]),
       ],
     );
 
@@ -389,6 +393,8 @@ class DatabaseAPI {
         Query.notEqual("matcher_id", ["empty"])
       ],
     );
+    print("userMatches");
+    print(userMatches.documents.first.data["name"]);
 
     final reciverMatches = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
@@ -409,6 +415,9 @@ class DatabaseAPI {
       documents: combinedMatches,
       total: combinedMatches.length,
     );
+
+    print("found matches");
+    print(documentList.documents.first.data);
 
     return documentList;
   }
@@ -454,12 +463,15 @@ class DatabaseAPI {
     }
   }
 
-  Future<XFile> loadimage({String pic_id=""}) async{
+  Future<XFile> loadimage({String pic_id = ""}) async {
     await auth.loadUser();
-    if(pic_id == ""){
+
+    if (pic_id == "") {
       pic_id = (await auth.userid)!;
     }
-    Uint8List result = await storage.getFileDownload(bucketId:COLLECTION_Images, fileId: pic_id);
+
+    Uint8List result = await storage.getFileDownload(
+        bucketId: COLLECTION_Images, fileId: pic_id);
     XFile xfile = XFile.fromData(result);
     print("returned image is:");
     print(xfile.path);
