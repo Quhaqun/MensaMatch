@@ -51,8 +51,6 @@ class DatabaseAPI {
         Query.equal("reciever_id", [matched_user_id])
       ],
     );
-    print("userMessages");
-    print(userMessages);
     final recieverMessages = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MESSAGES,
@@ -61,37 +59,28 @@ class DatabaseAPI {
         Query.equal("user_id", [matched_user_id]),
       ],
     );
-    print("2");
-    print("recieverMessages");
-    print(recieverMessages.documents);
     // Combine the results of both requests
     final List<Document> combinedMessages = [
       ...userMessages.documents,
       ...recieverMessages.documents,
     ];
 
-    print("3");
-    print("combinedMessages");
-    print(combinedMessages);
     // Sort the combined messages by timestamp
     combinedMessages.sort((a, b) {
       final timestampA = DateTime.parse(a.data['timestamp']);
       final timestampB = DateTime.parse(b.data['timestamp']);
       return timestampA.compareTo(timestampB); // Sort in ascending order
     });
-    print("4");
     // Create a DocumentList with the combined and sorted messages
     final documentList = DocumentList(
       documents: combinedMessages,
       total: combinedMessages.length,
     );
-    print("documentList");
-    print(documentList);
     return documentList;
   }
 
 
-  Future<Document> addMessage({required String message}) {
+  Future<Document> addMessage({required String message,required String reciever_id}) {
     return databases.createDocument(
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_MESSAGES,
@@ -100,7 +89,7 @@ class DatabaseAPI {
           'text': message,
           'timestamp': DateTime.now().toString(),
           'user_id': auth.userid,
-          'reciever_id': "65a0cc62e7b9d856bbef",
+          'reciever_id': reciever_id,
         });
   }
 
@@ -187,8 +176,6 @@ class DatabaseAPI {
         },
       );
     } else {
-      // Handle the case where the user already exists
-      print('User with email already exists');
       // You might want to return an error or handle it differently based on your requirements
       throw Exception('User with user_id already exists');
     }
@@ -232,10 +219,6 @@ class DatabaseAPI {
       if (existingUserProfile?.semester != semester) {
         updateData['semester'] = semester ?? existingUserProfile?.semester;
       }
-
-
-      print("new Data");
-      print(updateData);
       await databases.updateDocument(
         collectionId: COLLECTION_USERS,
         documentId: docId,
@@ -321,8 +304,6 @@ class DatabaseAPI {
         final semester = userDataMap['semester'] as int? ?? 0;
         final profile_picture = userDataMap['profile_picture'] as String? ?? '';
 
-        print("current user preferences");
-        print(userDataMap['preferences']);
         // Handle the comma-separated string for preferences
         final preferencesString = userDataMap['preferences'] as String? ?? '';
         final preferences = preferencesString.split(',').map((e) => e.trim()).toList();
@@ -367,8 +348,6 @@ class DatabaseAPI {
       if (response.documents.isNotEmpty) {
         try {
           final userDataMap = response.documents.first.data;
-          print("preferences");
-          print(userDataMap["preferences"]);
           final userProfile = UserProfile(
               name: userDataMap['name'],
               course: userDataMap['course'],
@@ -430,8 +409,6 @@ class DatabaseAPI {
   Future<DocumentList> getFoundMatches() async{
     auth = AuthAPI();
     await auth.loadUser();
-    print("useerid foundMatches");
-    print(auth.userid);
     final userMatches = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MATCH,
@@ -460,10 +437,6 @@ class DatabaseAPI {
       documents: combinedMatches,
       total: combinedMatches.length,
     );
-
-    print("found matches");
-    print(documentList.documents.last.data["name"]);
-
     return documentList;
   }
 
@@ -518,9 +491,6 @@ class DatabaseAPI {
     Uint8List result = await storage.getFileDownload(
         bucketId: COLLECTION_Images, fileId: pic_id);
     XFile xfile = XFile.fromData(result);
-    print("returned image is:");
-    print(xfile.path);
-    print(xfile.runtimeType);
     return xfile;
   }
 

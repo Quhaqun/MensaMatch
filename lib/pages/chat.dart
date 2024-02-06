@@ -35,8 +35,6 @@ class _MessagesPageState extends State<MessagesPage> {
     try {
       await appwrite.loadUser();
       final value = await database.getMessages(matched_user_id: widget.match_id);
-      print("value");
-      print(value.documents);
       setState(() {
         messages = value.documents;
       });
@@ -69,7 +67,7 @@ class _MessagesPageState extends State<MessagesPage> {
 
   addMessage() async {
     try {
-      await database.addMessage(message: messageTextController.text);
+      await database.addMessage(message: messageTextController.text,reciever_id: widget.match_id);
       messageTextController.clear();
       loadMessages();
     } on AppwriteException catch (e) {

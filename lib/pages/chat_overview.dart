@@ -12,7 +12,7 @@ import 'package:mensa_match/pages/chat.dart';
 import 'package:mensa_match/appwrite/database_api.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:provider/provider.dart';
-import 'package:mensa_match/components/image_picker.dart';
+
 
 class ChatOverview extends StatefulWidget {
   const ChatOverview({Key? key}) : super(key: key);
@@ -47,11 +47,8 @@ class _ChatOverviewState extends State<ChatOverview> {
   }
 
   ProfilePickLoad(String user_id) async {
-    print("DEBUG1");
     XFile image = await database.loadimage(pic_id: user_id);
-    print("DEBUG2");
     if (image.toString().isNotEmpty) {
-      print("DEBUG3");
       setState(() {
         _image = image;
       });
@@ -69,6 +66,7 @@ class _ChatOverviewState extends State<ChatOverview> {
       print("Error in loadFoundMatches(): $e");
     }
   }
+
 
   Future<Map<String, dynamic>> getUser(String match_id) async {
     try {
@@ -91,6 +89,8 @@ class _ChatOverviewState extends State<ChatOverview> {
       throw Exception("Failed to fetch user data");
     }
   }
+
+
 
 
   @override
@@ -185,8 +185,17 @@ Widget _buildSearchBar() {
             itemCount: matches.length,
             itemBuilder: (context, index) {
               final match = matches[index];
+              /*String sender_id = "";
+              if (match.data["matcher_id"] == database.auth.userid){
+                sender_id = match.data["user_id"];
+              }
+              else{
+                sender_id = match.data["matcher_id"];
+              }*/
+              String sender_id = match.data["matcher_id"];
+             // Future<DocumentList> messages = database.getMessages(matched_user_id: match.data["matcher_id"]);
               return FutureBuilder<Map<String, dynamic>>(
-                future: getUser(match.data["matcher_id"]),
+                future: getUser(sender_id),
                 builder: (context, userSnapshot) {
                   if (userSnapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator();
@@ -201,15 +210,15 @@ Widget _buildSearchBar() {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => MessagesPage(match_id: match.data["matcher_id"]),
+                            builder: (context) => MessagesPage(match_id: sender_id),
                           ),
                         );
                       },
                       child: chatOverviewElement(
                         image: 'https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png',
                         name: userData?['name'] ?? 'Unknown',
-                        message_preview: 'Latest message preview',
-                        match_id: match.data["matcher_id"],
+                        message_preview: 'This could be your first message',
+                        match_id: sender_id,
                       ),
                     );
                   }
