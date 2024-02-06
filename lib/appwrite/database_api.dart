@@ -39,10 +39,6 @@ class DatabaseAPI {
   Future<DocumentList> getMessages({String matched_user_id=""}) async {
     auth = AuthAPI();
     await auth.loadUser();
-    print("userid");
-    print(auth.userid);
-    print("matched_user_id");
-    print(matched_user_id);
     final userMessages = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MESSAGES,
