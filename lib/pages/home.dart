@@ -77,7 +77,8 @@ class _HomeState extends State<Home> {
         semester: 3,
         date: 'Today',
         time: '12.00 Uhr',
-        location: 'Skyline Mensa');
+        location: 'Skyline Mensa',
+        match_id: "");
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColorLight,

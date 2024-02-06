@@ -3,23 +3,33 @@ import 'package:mensa_match/constants/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mensa_match/pages/chat.dart';
 
+import '../pages/match_popup.dart';
+
 class chatOverviewElement extends StatelessWidget {
   final String image;
   final String name;
   final String message_preview;
+  final String match_id;
 
   const chatOverviewElement(
       {super.key,
       required this.image,
       required this.name,
-      required this.message_preview});
+      required this.message_preview,
+      required this.match_id});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => const MessagesPage()));
+          context,
+          MaterialPageRoute(
+            builder: (context) => MessagesPage(
+              match_id: match_id,
+            ),
+          ),
+        );
       },
       child: Container(
         padding:
