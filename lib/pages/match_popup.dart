@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mensa_match/constants/colors.dart';
 import 'package:mensa_match/components/button.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mensa_match/pages/chat.dart';
 import 'package:mensa_match/pages/chat_overview.dart';
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class MatchPopupData {
-  final String image;
+  final XFile? image;
   final String name;
   final int age;
   final String major;
@@ -85,8 +88,22 @@ class MatchPopup extends StatelessWidget {
                         ),
                         SizedBox(height: 16),
                         ClipOval(
-                          child: Image.network(
-                            data.image,
+                          child: data.image != null
+                              ? kIsWeb
+                              ? Image.network(
+                            data.image!.path, // Use XFile path directly on web
+                            width: 140,
+                            height: 140,
+                            fit: BoxFit.cover,
+                          )
+                              : Image.file(
+                            File(data.image!.path), // Use XFile path converted to File for app
+                            width: 140,
+                            height: 140,
+                            fit: BoxFit.cover,
+                          )
+                              : Image.asset(
+                            'assets/placeholder_image.png', // Provide a placeholder image asset path
                             width: 140,
                             height: 140,
                             fit: BoxFit.cover,

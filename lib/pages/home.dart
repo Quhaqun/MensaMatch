@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:provider/provider.dart';
 import 'package:mensa_match/components/toolbar.dart';
@@ -19,6 +20,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:mensa_match/appwrite/constants.dart';
 import 'package:flutter/widgets.dart';
+import 'package:mensa_match/pages/user_profile.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -33,6 +35,7 @@ class _HomeState extends State<Home> {
   late List<Document>? matches = [];
   final database = DatabaseAPI();
   AuthStatus authStatus = AuthStatus.uninitialized;
+  XFile? futurpic = null;
 
   static const _widgets = "";
 
@@ -66,20 +69,20 @@ class _HomeState extends State<Home> {
     }
   }
 
+  Future<List<Object>> loadProfilAsync(String found_id) async{
+    //print("found_id: $found_id");
+    XFile? mom = await database.loadimage(pic_id: found_id);
+
+    UserProfile? profil_return = await database.getUserProfile(searchid: found_id);
+
+    if(mom==null){
+      return [profil_return!];
+    }
+    return [profil_return!, mom];
+  }
+
   @override
   Widget build(BuildContext context) {
-    // example data
-    MatchPopupData popupData = MatchPopupData(
-        image: 'https://i.redd.it/ai7vmpdlj5p91.png',
-        name: 'Jennifer',
-        age: 21,
-        major: 'M.Sc. Computer Science',
-        semester: 3,
-        date: 'Today',
-        time: '12.00 Uhr',
-        location: 'Skyline Mensa',
-        match_id: "");
-
     return Scaffold(
       backgroundColor: AppColors.backgroundColorLight,
       body: LayoutBuilder(builder: (context, constraints) {
@@ -115,17 +118,51 @@ class _HomeState extends State<Home> {
                               itemCount: matches?.length ?? 0,
                               itemBuilder: (BuildContext context, int index) {
                                 Document match = matches![index];
-                                return HomeMeetingCard(
-                                  imageUrl:
-                                      "https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png", // Update with the correct index for imageUrl
-                                  name: match.data.values.elementAt(
-                                      0), // Update with the correct index for name
-                                  time:
-                                      '${match.data.values.elementAt(5)}:${match.data.values.elementAt(6)} Uhr', // Assuming the data structure contains hour and minute fields
-                                  location: match.data.values.elementAt(
-                                      1,
-                                      ),
-                                      popupData: popupData, // Update with the correct index for location
+                                String found_id = "";
+                                if (database.auth.userid == match.data['user_id']) {
+                                  found_id = match.data['matcher_id'];
+                                } else {
+                                  found_id = match.data['user_id'];
+                                }
+
+                                return FutureBuilder<List<Object>>(
+                                  future: loadProfilAsync(found_id),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState == ConnectionState.done) {
+                                      if (snapshot.hasData) {
+                                        DateTime now = DateTime.now();
+                                        DateTime dateTime = DateTime.parse(match.data['Date']);
+                                        if((dateTime.year > now.year || (dateTime.year == now.year && (dateTime.month > now.month || (dateTime.month == now.month && dateTime.day > now.day))))){
+                                          UserProfile found_profil = snapshot.data!.first as UserProfile;
+                                          if(snapshot.data!.length<2){
+
+                                          }
+                                          return HomeMeetingCard(
+                                            imageUrl: snapshot.data!.length<2 ? null : snapshot.data!.elementAt(1) as XFile, // Update with the correct index for imageUrl
+                                            name: found_profil.name, // Update with the correct index for name
+                                            time:
+                                            '${match.data.values.elementAt(5)}:${match.data.values.elementAt(6)} Uhr', // Assuming the data structure contains hour and minute fields
+                                            location: match.data.values.elementAt(1),
+                                            popupData: MatchPopupData(
+                                                image: snapshot.data!.length<2 ? null : snapshot.data!.elementAt(1) as XFile,
+                                                name: found_profil.name,
+                                                age: found_profil.age,
+                                                major: found_profil.course,
+                                                semester: found_profil.semester,
+                                                date: 'Today',
+                                                time: '${match.data.values.elementAt(5)}:${match.data.values.elementAt(6)} Uhr',
+                                                location: match.data.values.elementAt(1)), // Update with the correct index for location
+                                          );
+                                        }else{
+                                          return Container();
+                                        }
+                                      } else if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      }
+                                    }
+                                    // By default, show a loading spinner
+                                    return CircularProgressIndicator();
+                                  },
                                 );
                               },
                             ),
@@ -142,31 +179,58 @@ class _HomeState extends State<Home> {
                           const SizedBox(height: 12),
                           SizedBox(
                             height: 120.0,
-                            child: ListView(
+                            child: ListView.builder(
                               scrollDirection: Axis.horizontal,
-                              children: [
-                                HomeMeetingCard(
-                                    imageUrl:
-                                        'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
-                                    name: 'Lara',
-                                    time: '12:00 Uhr',
-                                    location: 'Skyline Mensa',
-                                    popupData: popupData),
-                                HomeMeetingCard(
-                                    imageUrl:
-                                        'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
-                                    name: 'Lara',
-                                    time: '12:00 Uhr',
-                                    location: 'Skyline Mensa',
-                                    popupData: popupData),
-                                HomeMeetingCard(
-                                    imageUrl:
-                                        'https://hackspirit.com/wp-content/uploads/2021/06/Copy-of-Rustic-Female-Teen-Magazine-Cover.jpg',
-                                    name: 'Lara',
-                                    time: '12:00 Uhr',
-                                    location: 'Skyline Mensa',
-                                    popupData: popupData)
-                              ],
+                              itemCount: matches?.length ?? 0,
+                              itemBuilder: (BuildContext context, int index) {
+                                Document match = matches![index];
+                                String found_id = "";
+                                if (database.auth.userid == match.data['user_id']) {
+                                  found_id = match.data['matcher_id'];
+                                } else {
+                                  found_id = match.data['user_id'];
+                                }
+
+                                return FutureBuilder<List<Object>>(
+                                  future: loadProfilAsync(found_id),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState == ConnectionState.done) {
+                                      if (snapshot.hasData) {
+                                        DateTime now = DateTime.now();
+                                        DateTime dateTime = DateTime.parse(match.data['Date']);
+                                        if(!(dateTime.year > now.year || (dateTime.year == now.year && (dateTime.month > now.month || (dateTime.month == now.month && dateTime.day > now.day))))){
+                                          UserProfile found_profil = snapshot.data!.first as UserProfile;
+                                          if(snapshot.data!.length<2){
+
+                                          }
+                                          return HomeMeetingCard(
+                                            imageUrl: snapshot.data!.length<2 ? null : snapshot.data!.elementAt(1) as XFile, // Update with the correct index for imageUrl
+                                            name: found_profil.name, // Update with the correct index for name
+                                            time:
+                                            '${match.data.values.elementAt(5)}:${match.data.values.elementAt(6)} Uhr', // Assuming the data structure contains hour and minute fields
+                                            location: match.data.values.elementAt(1),
+                                            popupData: MatchPopupData(
+                                                image: snapshot.data!.length<2 ? null : snapshot.data!.elementAt(1) as XFile,
+                                                name: found_profil.name,
+                                                age: found_profil.age,
+                                                major: found_profil.course,
+                                                semester: found_profil.semester,
+                                                date: 'Today',
+                                                time: '${match.data.values.elementAt(5)}:${match.data.values.elementAt(6)} Uhr',
+                                                location: match.data.values.elementAt(1)), // Update with the correct index for location
+                                          );
+                                        }else{
+                                          return Container();
+                                        }
+                                      } else if (snapshot.hasError) {
+                                        return Text('Error: ${snapshot.error}');
+                                      }
+                                    }
+                                    // By default, show a loading spinner
+                                    return CircularProgressIndicator();
+                                  },
+                                );
+                              },
                             ),
                           ),
                           const Spacer(),

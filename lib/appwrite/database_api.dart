@@ -350,7 +350,7 @@ class DatabaseAPI {
               email: userDataMap['email'],
               age: userDataMap['age'] as int,
               bio: userDataMap['bio'],
-              preferences: userDataMap['preferences'],
+              preferences: userDataMap["preferences"].split(","),
               semester: userDataMap['semester'] as int,
               user_id: userDataMap['user_id']
           );
@@ -437,12 +437,13 @@ class DatabaseAPI {
   }
 
 
-  Future<dynamic> updateMatch({required String id, required int starthour, required int startmin}) {
+  Future<dynamic> updateMatch({required String id, required int starthour, required int startmin, required String place}) {
     return databases.updateDocument(
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_MATCH,
         documentId: id,
         data: {
+          'Place': place,
           'matcher_id': auth.userid,
           'Starthour': starthour,
           'Startmin': startmin,
@@ -476,18 +477,21 @@ class DatabaseAPI {
       }
     }
   }
-
-  Future<XFile> loadimage({String pic_id = ""}) async {
+  
+  Future<XFile?> loadimage({String pic_id=""}) async{
     await auth.loadUser();
 
     if (pic_id == "") {
       pic_id = (await auth.userid)!;
     }
 
-    Uint8List result = await storage.getFileDownload(
-        bucketId: COLLECTION_Images, fileId: pic_id);
-    XFile xfile = XFile.fromData(result);
-    return xfile;
+    try{
+      Uint8List result = await storage.getFileDownload(bucketId:COLLECTION_Images, fileId: pic_id);
+      XFile xfile = XFile.fromData(result);
+      return xfile;
+    }catch(e){
+      return null;
+    }
   }
 
   updateimage(XFile xfile) async{

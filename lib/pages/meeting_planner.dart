@@ -198,6 +198,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
     String bestfind = "";
     int starthour_best = 0;
     int startmin_best = 0;
+    String best_place = "";
 
 
 
@@ -243,6 +244,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
         place_search.forEach((pl_ser) {
           selectedOptions.forEach((pl) {
             if (pl_ser == pl) {
+              best_place = pl;
               sameplace = false;
             }
           });
@@ -250,6 +252,8 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
 
         if(sameplace){
           score = score + 1;
+        }else{
+          best_place = selectedOptions.first;
         }
 
         final search_profil =  await database.getUserProfile(searchid: matcherid);
@@ -279,7 +283,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
     });
 
     if (bestfind != "" && max_score >= 2) {
-      connectMatch(bestfind, starthour_best, startmin_best);
+      connectMatch(bestfind, starthour_best, startmin_best, best_place);
       showCustomPopup('Match found', 'Your Match is now in the Homepage!');
     } else {
       createMatch();
@@ -288,11 +292,10 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
     }
   }
 
-  connectMatch(String id, int starthour_best, int startmin_best) async {
+  connectMatch(String id, int starthour_best, int startmin_best, String pl) async {
     try {
       print("match found");
-      final value = await database.updateMatch(
-          id: id, starthour: starthour_best, startmin: startmin_best);
+      final value = await database.updateMatch(id: id, starthour: starthour_best, startmin: startmin_best, place: pl);
       place.clear();
       major.clear();
       semester.clear();

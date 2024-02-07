@@ -55,7 +55,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   ProfilePickLoad() async {
-    XFile image =  await database.loadimage();
+    XFile? image =  await database.loadimage();
     if(image.toString().isNotEmpty){
       setState(() {
         _image = image;
