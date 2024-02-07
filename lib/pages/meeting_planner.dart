@@ -211,7 +211,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
       DateTime date_search = DateTime.parse(element.data['Date']);
       String major_search = element.data['Major'];
       int semester_search = element.data['Semester'];
-      String matcherid = element.data['matcher_id'];
+      String matcherid = element.data['user_id'];
       List<dynamic> place_search = jsonDecode(element.data['Place']);
       bool isintime = true;
 
@@ -245,7 +245,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
           selectedOptions.forEach((pl) {
             if (pl_ser == pl) {
               best_place = pl;
-              sameplace = false;
+              sameplace = true;
             }
           });
         });
@@ -274,6 +274,21 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
           score = score + 2;
         }
 
+        if(semester_search!=0 && semester.text.isNotEmpty) {
+          if (semester_search!=0 && my_profil!.semester!=0) {
+            if (semester_search == my_profil!.semester) {
+              score = score + 2;
+            }
+          }
+          if(semester.text.isNotEmpty&&search_profil!.semester!=0){
+            if(semester.text ==search_profil!.semester as String ){
+              score = score + 2;
+            }
+          }
+        }else{
+          score = score + 2;
+        }
+
         if (score >= max_score && isintime) {
           bestfind = element.$id;
           max_score = score;
@@ -282,7 +297,7 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
       }
     });
 
-    if (bestfind != "" && max_score >= 2) {
+    if (bestfind != "" && max_score >= 3) {
       connectMatch(bestfind, starthour_best, startmin_best, best_place);
       showCustomPopup('Match found', 'Your Match is now in the Homepage!');
     } else {

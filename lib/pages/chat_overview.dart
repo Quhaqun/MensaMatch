@@ -47,7 +47,7 @@ class _ChatOverviewState extends State<ChatOverview> {
   }
 
   ProfilePickLoad(String user_id) async {
-    XFile image = await database.loadimage(pic_id: user_id);
+    XFile? image = await database.loadimage(pic_id: user_id);
     if (image.toString().isNotEmpty) {
       setState(() {
         _image = image;

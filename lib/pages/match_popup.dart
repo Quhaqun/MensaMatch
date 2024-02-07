@@ -7,6 +7,9 @@ import 'package:mensa_match/pages/chat.dart';
 import 'package:mensa_match/pages/chat_overview.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:mensa_match/pages/home.dart';
+
+import '../appwrite/database_api.dart';
 
 class MatchPopupData {
   final XFile? image;
@@ -18,6 +21,7 @@ class MatchPopupData {
   final String time;
   final String location;
   final String match_id;
+  final String doc_id;
 
   MatchPopupData(
       {required this.image,
@@ -28,13 +32,16 @@ class MatchPopupData {
       required this.date,
       required this.time,
       required this.location,
-      required this.match_id});
+      required this.match_id,
+      required this.doc_id
+      });
 }
 
 class MatchPopup extends StatelessWidget {
   final MatchPopupData data;
+  final database = DatabaseAPI();
 
-  const MatchPopup({super.key, required this.data});
+  MatchPopup({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +194,16 @@ class MatchPopup extends StatelessWidget {
                         button_outline(
                             buttonText: 'Cancel Meeting',
                             color: AppColors.dangerColor,
-                            onPressed: () {}),
+                            onPressed: () {
+                              database.deletMatch(doc_id: data.doc_id);
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Home(),
+                                ),
+                              );
+                            }),
                         SizedBox(height: 20),
                             ],
                           ),

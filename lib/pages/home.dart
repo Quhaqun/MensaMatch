@@ -132,26 +132,24 @@ class _HomeState extends State<Home> {
                                       if (snapshot.hasData) {
                                         DateTime now = DateTime.now();
                                         DateTime dateTime = DateTime.parse(match.data['Date']);
-                                        if((dateTime.year > now.year || (dateTime.year == now.year && (dateTime.month > now.month || (dateTime.month == now.month && dateTime.day > now.day))))){
+                                        if(dateTime.year > now.year || (dateTime.year == now.year && (dateTime.month > now.month || (dateTime.month == now.month && (dateTime.day > now.day || (dateTime.day == now.day && (match.data['Endhour'] > now.hour || (match.data['Endhour'] == now.hour && match.data['Endmin'] > now.minute)))))))){
                                           UserProfile found_profil = snapshot.data!.first as UserProfile;
-                                          if(snapshot.data!.length<2){
-
-                                          }
                                           return HomeMeetingCard(
                                             imageUrl: snapshot.data!.length<2 ? null : snapshot.data!.elementAt(1) as XFile, // Update with the correct index for imageUrl
                                             name: found_profil.name, // Update with the correct index for name
-                                            time:
-                                            '${match.data.values.elementAt(5)}:${match.data.values.elementAt(6)} Uhr', // Assuming the data structure contains hour and minute fields
+                                            time:'${match.data['Starthour']}:${match.data['Startmin']} Uhr', // Assuming the data structure contains hour and minute fields
                                             location: match.data.values.elementAt(1),
                                             popupData: MatchPopupData(
+                                                doc_id: match.$id,
+                                                match_id: found_id,
                                                 image: snapshot.data!.length<2 ? null : snapshot.data!.elementAt(1) as XFile,
                                                 name: found_profil.name,
                                                 age: found_profil.age,
                                                 major: found_profil.course,
                                                 semester: found_profil.semester,
                                                 date: 'Today',
-                                                time: '${match.data.values.elementAt(5)}:${match.data.values.elementAt(6)} Uhr',
-                                                location: match.data.values.elementAt(1)), // Update with the correct index for location
+                                                time: '${match.data['Starthour']}:${match.data['Startmin']} Uhr',
+                                                location: match.data['Place']),
                                           );
                                         }else{
                                           return Container();
@@ -198,26 +196,24 @@ class _HomeState extends State<Home> {
                                       if (snapshot.hasData) {
                                         DateTime now = DateTime.now();
                                         DateTime dateTime = DateTime.parse(match.data['Date']);
-                                        if(!(dateTime.year > now.year || (dateTime.year == now.year && (dateTime.month > now.month || (dateTime.month == now.month && dateTime.day > now.day))))){
+                                        if(!(dateTime.year > now.year || (dateTime.year == now.year && (dateTime.month > now.month || (dateTime.month == now.month && (dateTime.day > now.day || (dateTime.day == now.day && (match.data['Endhour'] > now.hour || (match.data['Endhour'] == now.hour && match.data['Endmin'] > now.minute))))))))){
                                           UserProfile found_profil = snapshot.data!.first as UserProfile;
-                                          if(snapshot.data!.length<2){
-
-                                          }
                                           return HomeMeetingCard(
                                             imageUrl: snapshot.data!.length<2 ? null : snapshot.data!.elementAt(1) as XFile, // Update with the correct index for imageUrl
                                             name: found_profil.name, // Update with the correct index for name
-                                            time:
-                                            '${match.data.values.elementAt(5)}:${match.data.values.elementAt(6)} Uhr', // Assuming the data structure contains hour and minute fields
+                                            time:'${match.data['Starthour']}:${match.data['Startmin']} Uhr', // Assuming the data structure contains hour and minute fields
                                             location: match.data.values.elementAt(1),
                                             popupData: MatchPopupData(
+                                                doc_id: match.$id,
+                                                match_id: found_id,
                                                 image: snapshot.data!.length<2 ? null : snapshot.data!.elementAt(1) as XFile,
                                                 name: found_profil.name,
                                                 age: found_profil.age,
                                                 major: found_profil.course,
                                                 semester: found_profil.semester,
                                                 date: 'Today',
-                                                time: '${match.data.values.elementAt(5)}:${match.data.values.elementAt(6)} Uhr',
-                                                location: match.data.values.elementAt(1)), // Update with the correct index for location
+                                                time: '${match.data['Starthour']}:${match.data['Startmin']} Uhr',
+                                                location: match.data['Place']), // Update with the correct index for location
                                           );
                                         }else{
                                           return Container();

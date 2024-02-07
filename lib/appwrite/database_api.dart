@@ -451,6 +451,10 @@ class DatabaseAPI {
     );
   }
 
+  deletMatch({required String doc_id}){
+    return databases.deleteDocument(databaseId: APPWRITE_DATABASE_ID, collectionId: COLLECTION_MATCH, documentId: doc_id);
+  }
+
 
   saveimage({required XFile image}) async{
     String fileid = await auth.userid as String;
