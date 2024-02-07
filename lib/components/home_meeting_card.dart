@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mensa_match/constants/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mensa_match/pages/match_popup.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class HomeMeetingCard extends StatelessWidget {
   final XFile? imageUrl;
@@ -47,7 +50,7 @@ class HomeMeetingCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(
-                    image: imageUrl!=null ? NetworkImage(imageUrl!.path) : NetworkImage("https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png"),
+                    image: imageUrl !=null  ? !kIsWeb ? Image.file(File(imageUrl!.path)).image : NetworkImage(imageUrl!.path) : NetworkImage("https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png"),
                     fit: BoxFit.cover,
                   ),
                 ),

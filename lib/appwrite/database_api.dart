@@ -1,7 +1,5 @@
-
 import 'dart:async';
 import 'dart:ffi' if (dart.library.html) 'dart:html' as html;
-import 'dart:html';
 import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -12,7 +10,8 @@ import 'package:mensa_match/appwrite/constants.dart';
 import 'package:mensa_match/pages/user_profile.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
-
+import 'package:path_provider/path_provider.dart';
+import 'dart:io' as io;
 
 class DatabaseAPI {
   Client client = Client();
@@ -481,18 +480,24 @@ class DatabaseAPI {
       }
     }
   }
-  
+
   Future<XFile?> loadimage({String pic_id=""}) async{
     await auth.loadUser();
-
     if (pic_id == "") {
       pic_id = (await auth.userid)!;
     }
-
     try{
-      Uint8List result = await storage.getFileDownload(bucketId:COLLECTION_Images, fileId: pic_id);
-      XFile xfile = XFile.fromData(result);
-      return xfile;
+      if(kIsWeb) {
+        Uint8List result = await storage.getFileDownload(bucketId: COLLECTION_Images, fileId: pic_id);
+        XFile xfile = XFile.fromData(result);
+        return xfile;
+      }else{
+        final directory = await getApplicationDocumentsDirectory();
+        Uint8List result = await storage.getFileDownload(bucketId: COLLECTION_Images, fileId: pic_id);
+        final tempFile = io.File('${directory.path}/temp_image');
+        await tempFile.writeAsBytes(result);
+        return XFile(tempFile.path);
+      }
     }catch(e){
       return null;
     }
