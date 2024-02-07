@@ -45,7 +45,6 @@ class _ProfileState extends State<Profile> {
     XFile? image = await database.loadimage();
     print("DEBUG2");
     if (image.toString().isNotEmpty) {
-      print("DEBUG3");
       setState(() {
         _image = image;
       });
@@ -55,9 +54,6 @@ class _ProfileState extends State<Profile> {
   Future<void> _loadUserData() async {
     try {
       final loadedUserData = await database.getCurrentUser();
-      print("userData");
-      print(loadedUserData);
-
       setState(() {
         userData = loadedUserData; // Set instance variable
         isLoading = false; // Set isLoading to false after loading data

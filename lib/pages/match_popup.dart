@@ -17,6 +17,7 @@ class MatchPopupData {
   final String date;
   final String time;
   final String location;
+  final String match_id;
 
   MatchPopupData(
       {required this.image,
@@ -26,7 +27,8 @@ class MatchPopupData {
       required this.semester,
       required this.date,
       required this.time,
-      required this.location});
+      required this.location,
+      required this.match_id});
 }
 
 class MatchPopup extends StatelessWidget {
@@ -176,9 +178,11 @@ class MatchPopup extends StatelessWidget {
                             buttonText: 'Chat',
                             onPressed: () {
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => MessagesPage()));
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MessagesPage(match_id: data.match_id),
+                                ),
+                              );
                             }),
                         button_outline(
                             buttonText: 'Cancel Meeting',

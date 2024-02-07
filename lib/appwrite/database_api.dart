@@ -1,6 +1,7 @@
 
 import 'dart:async';
 import 'dart:ffi' if (dart.library.html) 'dart:html' as html;
+import 'dart:html';
 import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -35,23 +36,25 @@ class DatabaseAPI {
     storage = new Storage(client);
   }
 
-  Future<DocumentList> getMessages() async {
+  Future<DocumentList> getMessages({String matched_user_id=""}) async {
+    auth = AuthAPI();
+    await auth.loadUser();
     final userMessages = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MESSAGES,
       queries: [
         Query.equal("user_id", [auth.userid]),
+        Query.equal("reciever_id", [matched_user_id])
       ],
     );
-
     final recieverMessages = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MESSAGES,
       queries: [
         Query.equal("reciever_id", [auth.userid]),
+        Query.equal("user_id", [matched_user_id]),
       ],
     );
-
     // Combine the results of both requests
     final List<Document> combinedMessages = [
       ...userMessages.documents,
@@ -64,18 +67,16 @@ class DatabaseAPI {
       final timestampB = DateTime.parse(b.data['timestamp']);
       return timestampA.compareTo(timestampB); // Sort in ascending order
     });
-
     // Create a DocumentList with the combined and sorted messages
     final documentList = DocumentList(
       documents: combinedMessages,
       total: combinedMessages.length,
     );
-
     return documentList;
   }
 
 
-  Future<Document> addMessage({required String message}) {
+  Future<Document> addMessage({required String message,required String reciever_id}) {
     return databases.createDocument(
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_MESSAGES,
@@ -84,7 +85,7 @@ class DatabaseAPI {
           'text': message,
           'timestamp': DateTime.now().toString(),
           'user_id': auth.userid,
-          'reciever_id': "65a0cc62e7b9d856bbef",
+          'reciever_id': reciever_id,
         });
   }
 
@@ -171,8 +172,6 @@ class DatabaseAPI {
         },
       );
     } else {
-      // Handle the case where the user already exists
-      print('User with email already exists');
       // You might want to return an error or handle it differently based on your requirements
       throw Exception('User with user_id already exists');
     }
@@ -216,10 +215,6 @@ class DatabaseAPI {
       if (existingUserProfile?.semester != semester) {
         updateData['semester'] = semester ?? existingUserProfile?.semester;
       }
-
-
-      print("new Data");
-      print(updateData);
       await databases.updateDocument(
         collectionId: COLLECTION_USERS,
         documentId: docId,
@@ -247,6 +242,39 @@ class DatabaseAPI {
       updateData[fieldName] = oldValue;
     }
   }
+  Future<Map<String, dynamic>> getUser({required String searchid}) async {
+    auth = AuthAPI();
+    await auth.loadUser();
+
+    final user = await databases.listDocuments(
+      databaseId: APPWRITE_DATABASE_ID,
+      collectionId: COLLECTION_USERS,
+      queries: [
+        Query.equal("user_id", [searchid]),
+      ],
+    );
+
+    if (user.documents.isNotEmpty) {
+      try {
+        final userDataMap = user.documents.first.data;
+
+        final name = userDataMap['name'] as String? ?? '';
+        final age = userDataMap['age'] as int? ?? 0;
+        final profile_picture = userDataMap['profile_picture'] as String? ?? '';
+
+        return {
+          'name': name,
+          'age': age,
+          'profile_picture': profile_picture,
+        };
+      } catch (e) {
+        print("Error retrieving user data: $e");
+        return {};
+      }
+    } else {
+      return {}; // Return empty map if user document is not found
+    }
+  }
 
   Future<Map<String, dynamic>> getCurrentUser() async {
     auth = AuthAPI();
@@ -272,8 +300,6 @@ class DatabaseAPI {
         final semester = userDataMap['semester'] as int? ?? 0;
         final profile_picture = userDataMap['profile_picture'] as String? ?? '';
 
-        print("current user preferences");
-        print(userDataMap['preferences']);
         // Handle the comma-separated string for preferences
         final preferencesString = userDataMap['preferences'] as String? ?? '';
         final preferences = preferencesString.split(',').map((e) => e.trim()).toList();
@@ -407,7 +433,6 @@ class DatabaseAPI {
       documents: combinedMatches,
       total: combinedMatches.length,
     );
-
     return documentList;
   }
 
@@ -452,12 +477,14 @@ class DatabaseAPI {
       }
     }
   }
-
+  
   Future<XFile?> loadimage({String pic_id=""}) async{
     await auth.loadUser();
-    if(pic_id == ""){
+
+    if (pic_id == "") {
       pic_id = (await auth.userid)!;
     }
+
     try{
       Uint8List result = await storage.getFileDownload(bucketId:COLLECTION_Images, fileId: pic_id);
       XFile xfile = XFile.fromData(result);

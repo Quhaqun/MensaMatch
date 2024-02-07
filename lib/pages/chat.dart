@@ -4,9 +4,12 @@ import 'package:mensa_match/appwrite/database_api.dart';
 import 'package:flutter/material.dart';
 import 'package:appwrite/models.dart';
 import 'package:provider/provider.dart';
+import 'package:mensa_match/pages/match_popup.dart';
 
 class MessagesPage extends StatefulWidget {
-  const MessagesPage({Key? key}) : super(key: key);
+  final String match_id;
+
+  const MessagesPage({Key? key, required this.match_id}) : super(key: key);
 
   @override
   _MessagesPageState createState() => _MessagesPageState();
@@ -14,6 +17,7 @@ class MessagesPage extends StatefulWidget {
 
 class _MessagesPageState extends State<MessagesPage> {
   final database = DatabaseAPI();
+  final appwrite  = AuthAPI();
   late List<Document>? messages = [];
   TextEditingController messageTextController = TextEditingController();
   AuthStatus authStatus = AuthStatus.uninitialized;
@@ -24,11 +28,13 @@ class _MessagesPageState extends State<MessagesPage> {
     final AuthAPI appwrite = context.read<AuthAPI>();
     authStatus = appwrite.status;
     loadMessages();
+    getUser();
   }
 
   loadMessages() async {
     try {
-      final value = await database.getMessages();
+      await appwrite.loadUser();
+      final value = await database.getMessages(matched_user_id: widget.match_id);
       setState(() {
         messages = value.documents;
       });
@@ -37,9 +43,31 @@ class _MessagesPageState extends State<MessagesPage> {
     }
   }
 
+  Future<Map<String, dynamic>> getUser() async {
+    try {
+      Map<String, dynamic> userData = await database.getUser(searchid: widget.match_id);
+
+      // Extract specific fields from userData
+      final name = userData['name'] as String? ?? '';
+      final age = userData['age'] as int? ?? 0;
+      final profilePicture = 'https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png';
+
+      // Return a Map with the extracted values
+      return {
+        'name': name,
+        'age': age,
+        'profile_picture': profilePicture,
+      };
+    } catch (e) {
+      print("Error in getUser(): $e");
+      // Throw an exception or return an empty Map based on your requirement
+      throw Exception("Failed to fetch user data");
+    }
+  }
+
   addMessage() async {
     try {
-      await database.addMessage(message: messageTextController.text);
+      await database.addMessage(message: messageTextController.text,reciever_id: widget.match_id);
       messageTextController.clear();
       loadMessages();
     } on AppwriteException catch (e) {
@@ -93,14 +121,27 @@ class _MessagesPageState extends State<MessagesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage('https://example.com/placeholder_image.jpg'),
-            ),
-            const SizedBox(width: 8.0),
-            Text('Jonas'),
-          ],
+        title: FutureBuilder<Map<String, dynamic>>(
+          future: getUser(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text("Error: ${snapshot.error}");
+            } else {
+              final userMap = snapshot.data;
+
+              return Row(
+                children: [
+                  CircleAvatar(
+                    backgroundImage: NetworkImage('https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png'),
+                  ),
+                  const SizedBox(width: 8.0),
+                  Text(userMap?['name'] ?? "User Name"),
+                ],
+              );
+            }
+          },
         ),
         actions: [
           IconButton(
