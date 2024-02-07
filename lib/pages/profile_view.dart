@@ -42,7 +42,7 @@ class _ProfileState extends State<Profile> {
 
   ProfilePickLoad() async {
     print("DEBUG1");
-    XFile image = await database.loadimage();
+    XFile? image = await database.loadimage();
     print("DEBUG2");
     if (image.toString().isNotEmpty) {
       print("DEBUG3");
