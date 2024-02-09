@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mensa_match/constants/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mensa_match/pages/chat.dart';
@@ -6,7 +7,7 @@ import 'package:mensa_match/pages/chat.dart';
 import '../pages/match_popup.dart';
 
 class chatOverviewElement extends StatelessWidget {
-  final String image;
+  final XFile? image;
   final String name;
   final String message_preview;
   final String match_id;
@@ -50,7 +51,7 @@ class chatOverviewElement extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 image: DecorationImage(
-                  image: NetworkImage(image),
+                  image: NetworkImage(image!.path),
                   fit: BoxFit.cover,
                 ),
               ),

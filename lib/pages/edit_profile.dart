@@ -56,7 +56,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   ProfilePickLoad() async {
     XFile? image =  await database.loadimage();
-    if(image.toString().isNotEmpty){
+    if(image!=null){
       setState(() {
         _image = image;
       });
@@ -114,6 +114,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
           semester: semester,
         );
         database.updateimage(_image!);
+        if(_image!=null){
+          print("in save not null");
+        }
+
       }
     } catch (e) {
       if (kDebugMode) {

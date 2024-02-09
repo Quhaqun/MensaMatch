@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:mensa_match/appwrite/database_api.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +51,7 @@ class _MessagesPageState extends State<MessagesPage> {
       // Extract specific fields from userData
       final name = userData['name'] as String? ?? '';
       final age = userData['age'] as int? ?? 0;
-      final profilePicture = 'https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png';
+      XFile? profilePicture = await database.loadimage(pic_id: widget.match_id);
 
       // Return a Map with the extracted values
       return {
@@ -130,11 +131,12 @@ class _MessagesPageState extends State<MessagesPage> {
               return Text("Error: ${snapshot.error}");
             } else {
               final userMap = snapshot.data;
+              XFile? imageUrl = userMap?['profile_picture'];
 
               return Row(
                 children: [
                   CircleAvatar(
-                    backgroundImage: NetworkImage('https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png'),
+                    backgroundImage: NetworkImage(imageUrl!.path),
                   ),
                   const SizedBox(width: 8.0),
                   Text(userMap?['name'] ?? "User Name"),

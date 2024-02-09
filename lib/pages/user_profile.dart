@@ -15,7 +15,7 @@ class UserProfile {
     this.email = '',
     this.age = 0,
     this.bio = '',
-    required this.preferences,
+    this.preferences = const [],
     this.semester = 0,
   });
 

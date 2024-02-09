@@ -12,6 +12,8 @@ import 'package:mensa_match/pages/chat.dart';
 import 'package:mensa_match/appwrite/database_api.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 
 
 class ChatOverview extends StatefulWidget {
@@ -102,7 +104,7 @@ class _ChatOverviewState extends State<ChatOverview> {
       // Extract specific fields from userData
       final name = userData['name'] as String? ?? '';
       final age = userData['age'] as int? ?? 0;
-      final profilePicture = 'https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png';
+      XFile? profilePicture = await database.loadimage(pic_id: match_id);
 
       // Return a Map with the extracted values
       return {
@@ -236,7 +238,7 @@ class _ChatOverviewState extends State<ChatOverview> {
                         );
                       },
                       child: chatOverviewElement(
-                        image: 'https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png',
+                        image:userData?['profile_picture'],
                         name: userData?['name'] ?? 'Unknown',
                         message_preview: lastMessage ??
                             'this could be your first message',
