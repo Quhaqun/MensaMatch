@@ -344,13 +344,14 @@ class DatabaseAPI {
       if (response.documents.isNotEmpty) {
         try {
           final userDataMap = response.documents.first.data;
+          List<String> preferencesList = userDataMap['preferences'].split(", ");
           final userProfile = UserProfile(
               name: userDataMap['name'],
               course: userDataMap['course'],
               email: userDataMap['email'],
               age: userDataMap['age'] as int,
               bio: userDataMap['bio'],
-              preferences: userDataMap['preferences'],
+              preferences: preferencesList,//userDataMap['preferences'],
               semester: userDataMap['semester'] as int,
               user_id: userDataMap['user_id']
           );
