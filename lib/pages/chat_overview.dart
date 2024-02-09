@@ -1,6 +1,7 @@
 //import 'dart:ffi';
 
 import 'package:appwrite/models.dart';
+import 'dart:io' as io;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mensa_match/components/toolbar.dart';
@@ -13,6 +14,7 @@ import 'package:mensa_match/appwrite/database_api.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+
 
 
 
@@ -216,6 +218,8 @@ class _ChatOverviewState extends State<ChatOverview> {
               return Text("Error: ${userSnapshot.error}");
             } else {
               final userData = userSnapshot.data;
+              io.File placeholderImage = io.File('assets/assets/placeholder_image.png');
+              XFile placeholderXImage = new XFile((placeholderImage.path));
               return FutureBuilder<String>(
                 future: getLastMessage(senderId),
                 builder: (context, messageSnapshot) {
@@ -238,7 +242,7 @@ class _ChatOverviewState extends State<ChatOverview> {
                         );
                       },
                       child: chatOverviewElement(
-                        image:userData?['profile_picture'],
+                        image:userData?['profile_picture'] ??  placeholderXImage,
                         name: userData?['name'] ?? 'Unknown',
                         message_preview: lastMessage ??
                             'this could be your first message',
