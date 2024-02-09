@@ -13,12 +13,12 @@ class AuthAPI extends ChangeNotifier {
   Client client = Client();
   late final Account account;
 
-  late User _currentUser;
+   User? _currentUser;
 
   AuthStatus _status = AuthStatus.uninitialized;
 
   // Getter methods
-  User get currentUser => _currentUser;
+  User? get currentUser => _currentUser;
   AuthStatus get status => _status;
   String? get username => _currentUser?.name;
   String? get email => _currentUser?.email;
@@ -45,6 +45,7 @@ class AuthAPI extends ChangeNotifier {
       _status = AuthStatus.authenticated;
       _currentUser = user;
     } catch (e) {
+      print("got you!");
       _status = AuthStatus.unauthenticated;
     } finally {
       notifyListeners();

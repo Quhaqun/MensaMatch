@@ -38,11 +38,6 @@ class DatabaseAPI {
   Future<DocumentList> getMessages({String matched_user_id=""}) async {
     auth = AuthAPI();
     await auth.loadUser();
-    print("userid");
-    print(auth.userid);
-    print("recieverid");
-    print(matched_user_id);
-    print("DEBUG1");
     final userMessages = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MESSAGES,
@@ -51,7 +46,6 @@ class DatabaseAPI {
         Query.equal("reciever_id", matched_user_id.toString())
       ],
     );
-    print("DEBUG2");
     final recieverMessages = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MESSAGES,
@@ -60,7 +54,6 @@ class DatabaseAPI {
         Query.equal("user_id", matched_user_id.toString()),
       ],
     );
-    print("DEBUG3");
     // Combine the results of both requests
     final List<Document> combinedMessages = [
       ...userMessages.documents,
