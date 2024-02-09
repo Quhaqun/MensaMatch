@@ -1,3 +1,4 @@
+import 'dart:io' as io;
 import 'package:appwrite/appwrite.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:appwrite/models.dart';
 import 'package:provider/provider.dart';
 import 'package:mensa_match/pages/match_popup.dart';
+
 
 class MessagesPage extends StatefulWidget {
   final String match_id;
@@ -125,13 +127,15 @@ class _MessagesPageState extends State<MessagesPage> {
         title: FutureBuilder<Map<String, dynamic>>(
           future: getUser(),
           builder: (context, snapshot) {
+            io.File placeholderImage = io.File('assets/assets/placeholder_image.png');
+            XFile placeholderXImage = new XFile((placeholderImage.path));
             if (snapshot.connectionState == ConnectionState.waiting) {
               return CircularProgressIndicator();
             } else if (snapshot.hasError) {
               return Text("Error: ${snapshot.error}");
             } else {
               final userMap = snapshot.data;
-              XFile? imageUrl = userMap?['profile_picture'];
+              XFile? imageUrl = userMap?['profile_picture'] ??  placeholderXImage;
 
               return Row(
                 children: [

@@ -52,8 +52,6 @@ class _ProfileState extends State<Profile> {
   Future<void> _loadUserData() async {
     try {
       final loadedUserData = await database.getCurrentUser();
-      print("loadedUserData");
-      print(loadedUserData);
       setState(() {
         userData = loadedUserData; // Set instance variable
         isLoading = false; // Set isLoading to false after loading data
@@ -216,7 +214,7 @@ class _ProfileState extends State<Profile> {
                             ReadOnlyBubbleList(
                                 availableOptions: Interests.availableOptions,
                                 selectedOptions:
-                                    (userData?["selectedPreferences"]
+                                    (userData?["preferences"]
                                             as List<String>?) ??
                                         [])
                           ])),

@@ -1,15 +1,14 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:flutter/material.dart';
 import 'package:mensa_match/appwrite/auth_api.dart';
 import 'package:mensa_match/components/button.dart';
 import 'package:mensa_match/components/input_textfield.dart';
 import 'package:mensa_match/components/wave_background.dart';
+import 'package:mensa_match/constants/colors.dart';
 import 'package:mensa_match/pages/home.dart';
 import 'package:mensa_match/pages/register.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-
-import 'package:mensa_match/constants/colors.dart';
+import 'package:mensa_match/components/input_password.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LoginPage extends StatefulWidget {
@@ -17,6 +16,7 @@ class LoginPage extends StatefulWidget {
 
   @override
   _LoginPageState createState() => _LoginPageState();
+
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -141,9 +141,11 @@ class _LoginPageState extends State<LoginPage> {
                               controller: emailTextController,
                               labelText: "Email"),
                           // Password textfield
-                          input_textfield(
-                              controller: passwordTextController,
-                              labelText: "Password"),
+                          input_password(
+                            controller: passwordTextController,
+                            labelText: "Password",
+                            obscureText: true, // Set obscureText to true to hide the password
+                          ),
                           // Sign In button
                           SizedBox(height: 20),
                           button_primary(
@@ -167,7 +169,7 @@ class _LoginPageState extends State<LoginPage> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            const RegisterPage()));
+                                        const RegisterPage()));
                               }),
                         ],
                       ),
