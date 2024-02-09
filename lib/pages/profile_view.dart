@@ -26,24 +26,22 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   final DatabaseAPI database = DatabaseAPI();
   XFile? _image = null;
-  late Map<String, dynamic> userData; // Store user data here
+  Map<String, dynamic>? userData; // Store user data here
   AuthStatus authStatus = AuthStatus.uninitialized;
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
     final AuthAPI appwrite = context.read<AuthAPI>();
     authStatus = appwrite.status;
     appwrite.loadUser();
+    _loadUserData();
     ProfilePickLoad();
   }
 
   ProfilePickLoad() async {
-    print("DEBUG1");
     XFile? image = await database.loadimage();
-    print("DEBUG2");
     if (image.toString().isNotEmpty) {
       setState(() {
         _image = image;
@@ -54,6 +52,8 @@ class _ProfileState extends State<Profile> {
   Future<void> _loadUserData() async {
     try {
       final loadedUserData = await database.getCurrentUser();
+      print("loadedUserData");
+      print(loadedUserData);
       setState(() {
         userData = loadedUserData; // Set instance variable
         isLoading = false; // Set isLoading to false after loading data
@@ -156,7 +156,7 @@ class _ProfileState extends State<Profile> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${userData["name"]}, ${userData["age"].toString()}',
+                          '${userData?["name"]} , ${userData?["age"].toString()}  ',
                           style: GoogleFonts.roboto(
                             color: AppColors.textColorDark,
                             fontWeight: FontWeight.w700,
@@ -164,7 +164,7 @@ class _ProfileState extends State<Profile> {
                           ),
                         ),
                         Text(
-                          userData["course"] ?? "null",
+                          userData?["course"] ?? "null",
                           style: GoogleFonts.roboto(
                             color: AppColors.textColorGray,
                             fontWeight: FontWeight.w400,
@@ -172,7 +172,7 @@ class _ProfileState extends State<Profile> {
                           ),
                         ),
                         Text(
-                          '${getSemesterString(userData["semester"])} Semester',
+                          '${getSemesterString(userData?["semester"])} Semester',
                           style: GoogleFonts.roboto(
                             color: AppColors.textColorGray,
                             fontWeight: FontWeight.w400,
@@ -186,7 +186,7 @@ class _ProfileState extends State<Profile> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Text(
-                      userData["bio"] ?? "null",
+                      userData?["bio"] ?? "null",
                       style: GoogleFonts.roboto(
                         color: AppColors.textColorGray,
                         fontWeight: FontWeight.w400,
@@ -216,7 +216,7 @@ class _ProfileState extends State<Profile> {
                             ReadOnlyBubbleList(
                                 availableOptions: Interests.availableOptions,
                                 selectedOptions:
-                                    (userData["selectedPreferences"]
+                                    (userData?["selectedPreferences"]
                                             as List<String>?) ??
                                         [])
                           ])),
