@@ -38,22 +38,29 @@ class DatabaseAPI {
   Future<DocumentList> getMessages({String matched_user_id=""}) async {
     auth = AuthAPI();
     await auth.loadUser();
+    print("userid");
+    print(auth.userid);
+    print("recieverid");
+    print(matched_user_id);
+    print("DEBUG1");
     final userMessages = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MESSAGES,
       queries: [
-        Query.equal("user_id", [auth.userid]),
-        Query.equal("reciever_id", [matched_user_id])
+        Query.equal("user_id", auth.userid.toString()),
+        Query.equal("reciever_id", matched_user_id.toString())
       ],
     );
+    print("DEBUG2");
     final recieverMessages = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MESSAGES,
       queries: [
-        Query.equal("reciever_id", [auth.userid]),
-        Query.equal("user_id", [matched_user_id]),
+        Query.equal("reciever_id", auth.userid.toString()),
+        Query.equal("user_id", matched_user_id.toString()),
       ],
     );
+    print("DEBUG3");
     // Combine the results of both requests
     final List<Document> combinedMessages = [
       ...userMessages.documents,
@@ -133,7 +140,7 @@ class DatabaseAPI {
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_USERS,
         queries: [
-          Query.equal('email', [email]),
+          Query.equal('email', email),
         ],
       );
 
@@ -193,7 +200,7 @@ class DatabaseAPI {
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_USERS,
         queries: [
-          Query.equal("user_id", [auth.userid]),
+          Query.equal("user_id", auth.userid),
         ],
       );
       var docId = filteredUser.documents.first.$id;
@@ -249,7 +256,7 @@ class DatabaseAPI {
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_USERS,
       queries: [
-        Query.equal("user_id", [searchid]),
+        Query.equal("user_id", searchid),
       ],
     );
 
@@ -283,7 +290,7 @@ class DatabaseAPI {
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_USERS,
       queries: [
-        Query.equal("user_id", [auth.userid]),
+        Query.equal("user_id", auth.userid),
       ],
     );
 
@@ -337,7 +344,7 @@ class DatabaseAPI {
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_USERS,
         queries: [
-          Query.equal('user_id', [searchid!]),
+          Query.equal('user_id', searchid!),
         ],
       );
       if (response.documents.isNotEmpty) {
@@ -393,8 +400,8 @@ class DatabaseAPI {
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MATCH,
       queries: [
-        Query.notEqual("user_id", [auth.userid]),
-        Query.equal("matcher_id", ["empty"])
+        Query.notEqual("user_id", auth.userid),
+        Query.equal("matcher_id", "empty")
       ],
     );
 
@@ -404,12 +411,13 @@ class DatabaseAPI {
   Future<DocumentList> getFoundMatches() async{
     auth = AuthAPI();
     await auth.loadUser();
+
     final userMatches = await databases.listDocuments(
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MATCH,
       queries: [
-        Query.equal("user_id", [auth.userid]),
-        Query.notEqual("matcher_id", ["empty"])
+        Query.equal("user_id", auth.userid),
+        Query.notEqual("matcher_id", "empty")
       ],
     );
 
@@ -417,7 +425,7 @@ class DatabaseAPI {
       databaseId: APPWRITE_DATABASE_ID,
       collectionId: COLLECTION_MATCH,
       queries: [
-        Query.equal("matcher_id", [auth.userid])
+        Query.equal("matcher_id", auth.userid)
       ],
     );
 
