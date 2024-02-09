@@ -165,9 +165,8 @@ class DatabaseAPI {
           'age': 0,
           'semester': 0,
           'bio': "",
-          'preferences': [], // Change here
+          'preferences': [].toString(), // Change here
           'user_id': auth.userid,
-          'profile_picture': "",
         },
       );
     } else {
@@ -506,11 +505,14 @@ class DatabaseAPI {
   updateimage(XFile xfile) async{
     await auth.loadUser();
     var pic_id = (await auth.userid)!;
-    var image = storage.getFile(bucketId: COLLECTION_Images, fileId: pic_id);
-    if (image != null) {
-      storage.deleteFile(bucketId: COLLECTION_Images, fileId: pic_id);
+    try{
+      await storage.deleteFile(bucketId: COLLECTION_Images, fileId: pic_id);
+      print("id1: $pic_id");
+      await saveimage(image: xfile);
+    }catch(e){
+      print("id: $pic_id");
+      await saveimage(image: xfile);
     }
-    saveimage(image: xfile);
   }
 
 

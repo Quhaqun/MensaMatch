@@ -127,6 +127,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 Container(
                                   child: CircularImagePicker(
                                       imageSize: 140,
+                                      image: image,
                                       onImageSelected: (selectedImage) {
                                         setState(() {
                                           image = selectedImage;
