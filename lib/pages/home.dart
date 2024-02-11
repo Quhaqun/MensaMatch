@@ -140,7 +140,7 @@ class _HomeState extends State<Home> {
                                           return HomeMeetingCard(
                                             imageUrl: snapshot.data!.length<2 ? null : snapshot.data!.elementAt(1) as XFile, // Update with the correct index for imageUrl
                                             name: found_profil.name, // Update with the correct index for name
-                                            time:'${match.data['Starthour']}:${match.data['Startmin']} Uhr', // Assuming the data structure contains hour and minute fields
+                                            time: ((match.data['Starthour'] < 10 ? '0' + match.data['Starthour'].toString() : match.data['Starthour'].toString()) + ':' + (match.data['Startmin'] < 10 ? '0' + match.data['Startmin'].toString() : match.data['Startmin'].toString()) + ' Uhr'), // Assuming the data structure contains hour and minute fields
                                             location: match.data.values.elementAt(1),
                                             popupData: MatchPopupData(
                                                 doc_id: match.$id,
@@ -151,7 +151,7 @@ class _HomeState extends State<Home> {
                                                 major: found_profil.course,
                                                 semester: found_profil.semester,
                                                 date: dateTime.day == now.day ? 'Today':'Tomorrow',
-                                                time: '${match.data['Starthour']}:${match.data['Startmin']} Uhr',
+                                                time: ((match.data['Starthour'] < 10 ? '0' + match.data['Starthour'].toString() : match.data['Starthour'].toString()) + ':' + (match.data['Startmin'] < 10 ? '0' + match.data['Startmin'].toString() : match.data['Startmin'].toString()) + ' Uhr'), // Assuming the data structure contains hour and minute fields
                                                 location: match.data['Place']),
                                           );
                                         }else{
@@ -210,7 +210,7 @@ class _HomeState extends State<Home> {
                                           return HomeMeetingCard(
                                             imageUrl: snapshot.data!.length<2 ? null : snapshot.data!.elementAt(1) as XFile, // Update with the correct index for imageUrl
                                             name: found_profil.name, // Update with the correct index for name
-                                            time:'${match.data['Starthour']}:${match.data['Startmin']} Uhr', // Assuming the data structure contains hour and minute fields
+                                            time: ((match.data['Starthour'] < 10 ? '0' + match.data['Starthour'].toString() : match.data['Starthour'].toString()) + ':' + (match.data['Startmin'] < 10 ? '0' + match.data['Startmin'].toString() : match.data['Startmin'].toString()) + ' Uhr'), // Assuming the data structure contains hour and minute fields
                                             location: match.data.values.elementAt(1),
                                             popupData: MatchPopupData(
                                                 doc_id: match.$id,
@@ -221,7 +221,7 @@ class _HomeState extends State<Home> {
                                                 major: found_profil.course,
                                                 semester: found_profil.semester,
                                                 date: 'Past',
-                                                time: '${match.data['Starthour']}:${match.data['Startmin']} Uhr',
+                                                time: ((match.data['Starthour'] < 10 ? '0' + match.data['Starthour'].toString() : match.data['Starthour'].toString()) + ':' + (match.data['Startmin'] < 10 ? '0' + match.data['Startmin'].toString() : match.data['Startmin'].toString()) + ' Uhr'), // Assuming the data structure contains hour and minute fields
                                                 location: match.data['Place']), // Update with the correct index for location
                                           );
                                         }else{

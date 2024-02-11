@@ -36,6 +36,7 @@ class HomeMeetingCard extends StatelessWidget {
           );
         },
         child: Container(
+          width: 240,
           margin: EdgeInsets.only(right: 16.0),
           padding: EdgeInsets.all(16.0),
           decoration: BoxDecoration(
