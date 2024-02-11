@@ -13,4 +13,5 @@ class AppColors {
   static const Color dangerColor = Color(0xFFFF2929);
   static const Color cardColor = Color(0xFFEDF0F3);
   static const Color dividerGray = Color(0xFFC0C2C5);
+  static const Color messageSender = Color(0xFF345573);
 }

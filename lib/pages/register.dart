@@ -37,12 +37,18 @@ class _RegisterPageState extends State<RegisterPage> {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return Dialog(
+          return const Dialog(
             backgroundColor: Colors.transparent,
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: const [
-                  CircularProgressIndicator(),
+                children: [
+                  SizedBox(
+                    height: 50.0,
+                    width: 50.0,
+                    child: Center(
+                        child: CircularProgressIndicator()
+                    ),
+                  ),
                 ]),
           );
         });
