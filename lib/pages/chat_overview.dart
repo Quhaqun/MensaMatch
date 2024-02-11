@@ -213,7 +213,13 @@ class _ChatOverviewState extends State<ChatOverview> {
           future: getUser(senderId),
           builder: (context, userSnapshot) {
             if (userSnapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
+              return const SizedBox(
+                height: 50.0,
+                width: 50.0,
+                child: Center(
+                    child: CircularProgressIndicator()
+                ),
+              );
             } else if (userSnapshot.hasError) {
               return Text("Error: ${userSnapshot.error}");
             } else {
@@ -225,7 +231,13 @@ class _ChatOverviewState extends State<ChatOverview> {
                 builder: (context, messageSnapshot) {
                   if (messageSnapshot.connectionState ==
                       ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
+                    return const SizedBox(
+                      height: 50.0,
+                      width: 50.0,
+                      child: Center(
+                          child: CircularProgressIndicator()
+                      ),
+                    );
                   } else if (messageSnapshot.hasError) {
                     return Text("Error: ${messageSnapshot.error}");
                   } else {

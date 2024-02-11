@@ -162,7 +162,13 @@ class _HomeState extends State<Home> {
                                       }
                                     }
                                     // By default, show a loading spinner
-                                    return CircularProgressIndicator();
+                                    return const SizedBox(
+                                      height: 50.0,
+                                      width: 50.0,
+                                      child: Center(
+                                          child: CircularProgressIndicator()
+                                      ),
+                                    );
                                   },
                                 );
                               },
@@ -226,7 +232,13 @@ class _HomeState extends State<Home> {
                                       }
                                     }
                                     // By default, show a loading spinner
-                                    return CircularProgressIndicator();
+                                    return const SizedBox(
+                                      height: 50.0,
+                                      width: 50.0,
+                                      child: Center(
+                                          child: CircularProgressIndicator()
+                                      ),
+                                    );
                                   },
                                 );
                               },

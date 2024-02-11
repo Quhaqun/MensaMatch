@@ -34,7 +34,13 @@ class _LoginPageState extends State<LoginPage> {
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 50.0,
+                    width: 50.0,
+                    child: Center(
+                        child: CircularProgressIndicator()
+                    ),
+                  ),
                 ]),
           );
         });
