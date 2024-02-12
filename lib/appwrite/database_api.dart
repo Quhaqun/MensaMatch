@@ -322,6 +322,33 @@ class DatabaseAPI {
   }
 
 
+  Future<UserProfile?> getProfile({String? searchid=""}) async {
+    final response = await databases.listDocuments(
+        databaseId: APPWRITE_DATABASE_ID,
+        collectionId: COLLECTION_USERS,
+        queries: [
+          Query.equal('user_id', searchid),
+        ],
+    );
+    if (response.documents.isNotEmpty) {
+      final userDataMap = response.documents.first.data;
+      final userProfile = UserProfile(
+            name: userDataMap['name'],
+            course: userDataMap['course'],
+            email: userDataMap['email'],
+            age: userDataMap['age'] as int,
+            bio: userDataMap['bio'],
+            preferences: userDataMap["preferences"].split(","),
+            semester: userDataMap['semester'] as int,
+            user_id: userDataMap['user_id']
+      );
+      return userProfile;
+    }
+    else{
+      return null;
+      }
+  }
+
 
   Future<UserProfile?> getUserProfile({String? searchid=""}) async {
     try {
@@ -336,7 +363,7 @@ class DatabaseAPI {
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_USERS,
         queries: [
-          Query.equal('user_id', searchid!),
+          Query.equal('user_id', searchid),
         ],
       );
       if (response.documents.isNotEmpty) {

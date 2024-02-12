@@ -12,6 +12,7 @@ import 'package:mensa_match/components/wave_background.dart';
 import 'package:mensa_match/components/page_header.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mensa_match/pages/profile_view.dart';
+import 'package:mensa_match/pages/user_info.dart';
 
 class MessagesPage extends StatefulWidget {
   final String match_id;
@@ -233,7 +234,7 @@ class _MessagesPageState extends State<MessagesPage> {
                                         ),
                                         onPressed: () {
                                           Navigator.push(
-                                              context, MaterialPageRoute(builder: (context) => Profile()));
+                                              context, MaterialPageRoute(builder: (context) => UserInfo(showEditButton: false,id: widget.match_id)));
                                         },
                                       ),
                                     ],
