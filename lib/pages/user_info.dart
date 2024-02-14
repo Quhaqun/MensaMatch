@@ -44,7 +44,7 @@ class _UserInfoState extends State<UserInfo> {
   }
 
   ProfilePickLoad() async {
-    XFile? image = await database.loadimage();
+    XFile? image = await database.loadimage(pic_id: widget.id);
     if (image.toString().isNotEmpty) {
       setState(() {
         _image = image;
