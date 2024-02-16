@@ -12,6 +12,7 @@ import 'package:mensa_match/components/bubble.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mensa_match/components/image_picker.dart';
 import 'package:mensa_match/constants/interests.dart';
+import 'package:mensa_match/components/popup_match.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({Key? key}) : super(key: key);
@@ -33,6 +34,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
   XFile? _image = null;
 
   AuthStatus authStatus = AuthStatus.uninitialized;
+
+  void showCustomPopup(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return CustomPopup(title: title, message: message);
+      },
+    );
+  }
 
   @override
   void initState() {
@@ -113,14 +123,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
           preferences: selectedPreferences.join(', '),
           semester: semester,
         );
-        database.updateimage(_image!);
+
         if(_image!=null){
-          print("in save not null");
+          database.updateimage(_image!);
         }
+
+        showCustomPopup("Profile Updated", "Your profile has been updated");
 
       }
     } catch (e) {
       if (kDebugMode) {
+        showCustomPopup("Error Profile Updated", "Your profile has not been updated");
         print('Error updating user profile: $e');
       }
     }

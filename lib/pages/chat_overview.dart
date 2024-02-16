@@ -78,15 +78,17 @@ class _ChatOverviewState extends State<ChatOverview> {
     //try {
       await appwrite.loadUser();
       final documentList = await database.getMessages(matched_user_id: matchedUserId);
-
+      print("jjjjjj");
       // Assuming each document has a 'message' field
       if (documentList.documents.isNotEmpty) {
         // Extracting the message from the last document
         String message = documentList.documents.last.data.values.first;
+        print("ju");
         return message;
       } else {
         // Return a default message or throw an error if no messages found
-        throw Exception('No messages found for user $matchedUserId');
+        String message = "Write your first Message";
+        return message;
       }
     //} catch (e) {
       // Handle errors appropriately (printing to console is okay for debugging)

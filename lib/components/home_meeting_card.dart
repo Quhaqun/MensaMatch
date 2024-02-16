@@ -43,52 +43,59 @@ class HomeMeetingCard extends StatelessWidget {
             color: AppColors.cardColor,
             borderRadius: BorderRadius.circular(10.0),
           ),
-          child: Row(
-            children: [
-              Container(
-                width: 70.0,
-                height: 70.0,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: imageUrl !=null  ? !kIsWeb ? Image.file(File(imageUrl!.path)).image : NetworkImage(imageUrl!.path) : NetworkImage("https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png"),
-                    fit: BoxFit.cover,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                Container(
+                  width: 70.0,
+                  height: 70.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: imageUrl != null
+                          ? !kIsWeb
+                          ? Image.file(File(imageUrl!.path)).image
+                          : NetworkImage(imageUrl!.path)
+                          : NetworkImage("https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png"),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(width: 16.0),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    name,
-                    style: GoogleFonts.roboto(
-                      color: AppColors.textColorDark,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 20,
-                      height: 1.0,
+                SizedBox(width: 16.0),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      name,
+                      style: GoogleFonts.roboto(
+                        color: AppColors.textColorDark,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
+                        height: 1.0,
+                      ),
                     ),
-                  ),
-                  Text(
-                    time,
-                    style: GoogleFonts.roboto(
-                      color: AppColors.textColorDark,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 20,
+                    Text(
+                      time,
+                      style: GoogleFonts.roboto(
+                        color: AppColors.textColorDark,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 20,
+                      ),
                     ),
-                  ),
-                  Text(
-                    location,
-                    style: GoogleFonts.roboto(
-                      color: AppColors.textColorDark,
-                      fontWeight: FontWeight.w300,
-                      fontSize: 16,
+                    Text(
+                      location,
+                      style: GoogleFonts.roboto(
+                        color: AppColors.textColorDark,
+                        fontWeight: FontWeight.w300,
+                        fontSize: 16,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ));
   }

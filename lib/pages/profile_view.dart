@@ -10,6 +10,8 @@ import 'package:mensa_match/components/image_picker.dart';
 import 'package:mensa_match/pages/match_popup.dart';
 import '../appwrite/auth_api.dart'; // Import your DatabaseAPI
 import 'package:mensa_match/constants/interests.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io';
 
 class Profile extends StatefulWidget {
   final bool showEditButton;
@@ -88,7 +90,7 @@ class _ProfileState extends State<Profile> {
                               .cardColor, // Set grey background if _image is null
                       image: _image != null
                           ? DecorationImage(
-                              image: NetworkImage(_image!.path),
+                              image: _image !=null  ? !kIsWeb ? Image.file(File(_image!.path)).image : NetworkImage(_image!.path) : NetworkImage("https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png"),
                               fit: BoxFit.cover,
                             )
                           : null,

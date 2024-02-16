@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io';
 
 class CircularImagePicker extends StatefulWidget {
   final Function(XFile?) onImageSelected;
@@ -40,9 +42,17 @@ class _CircularImagePickerState extends State<CircularImagePicker> {
               color: Colors.grey[200], // Placeholder color
             ),
             child: widget.image != null
-                ? ClipOval(
+                ? kIsWeb ? ClipOval(
                     child: Image.network(
                       widget.image!.path,
+                      width: widget.imageSize,
+                      height: widget.imageSize,
+                      fit: BoxFit.cover,
+                    ),
+                  ) :
+                  ClipOval(
+                    child: Image.file(
+                      File(widget.image!.path),
                       width: widget.imageSize,
                       height: widget.imageSize,
                       fit: BoxFit.cover,
