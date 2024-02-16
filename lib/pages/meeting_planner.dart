@@ -232,11 +232,21 @@ class _MeetingPlannerState extends State<MeetingPlanner> {
             isintime = false;
           }
         } else {
-          if (starthour_search <= endhour) {
-            starthour_best = starthour_search;
-            startmin_best = startmin_search;
+          if (starthour_search == starthour) {
+            if (startmin_search < startmin) {
+              starthour_best = starthour;
+              startmin_best = startmin;
+            }else{
+              starthour_best = starthour_search;
+              startmin_best = startmin_search;
+            }
           } else {
-            isintime = false;
+            if(starthour_search < starthour){
+              starthour_best = starthour_search;
+              startmin_best = startmin_search;
+            }else{
+              isintime = false;
+            }
           }
         }
 
