@@ -51,27 +51,30 @@ class _ChatOverviewState extends State<ChatOverview> {
   }
 
   ProfilePickLoad(String user_id) async {
-    await appwrite.loadUser();
-    XFile? image = await database.loadimage(pic_id: user_id);
-    if (image
-        .toString()
-        .isNotEmpty) {
-      setState(() {
-        _image = image;
-      });
+    try{
+      await appwrite.loadUser();
+      XFile? image = await database.loadimage(pic_id: user_id);
+      if (image.toString().isNotEmpty) {
+        setState(() {
+          _image = image;
+        });
+      }
+    }catch (e){
+      print("error loading image in chatoverview");
     }
+
   }
 
   loadFoundMatches() async {
-    //try {
+    try {
       await appwrite.loadUser();
       final value = await database.getFoundMatches();
       setState(() {
         matches = value.documents;
       });
-    //} catch (e) {
-    //  print("Error in loadFoundMatches(): $e");
-    //}
+    } catch (e) {
+       print("Error in loadFoundMatches(): $e");
+    }
   }
 
   Future<String> getLastMessage(String matchedUserId) async {
@@ -100,7 +103,7 @@ class _ChatOverviewState extends State<ChatOverview> {
 
 
   Future<Map<String, dynamic>> getUser(String match_id) async {
-   // try {
+    try {
       await appwrite.loadUser();
       Map<String, dynamic> userData = await database.getUser(
           searchid: match_id);
@@ -116,11 +119,16 @@ class _ChatOverviewState extends State<ChatOverview> {
         'age': age,
         'profile_picture': profilePicture,
       };
-    //} catch (e) {
-     // print("Error in getUser(): $e");
+    } catch (e) {
+      print("Error in getUser(): $e");
+      return {
+        'name': "name",
+        'age': 0,
+        'profile_picture': null,
+      };
       // Throw an exception or return an empty Map based on your requirement
      // throw Exception("Failed to fetch user data");
-    //}
+    }
   }
 
 
@@ -211,6 +219,7 @@ class _ChatOverviewState extends State<ChatOverview> {
         } else {
           senderId = match.data['user_id'];
         }
+        print("still hereeeee");
         return FutureBuilder<Map<String, dynamic>>(
           future: getUser(senderId),
           builder: (context, userSnapshot) {
@@ -256,7 +265,7 @@ class _ChatOverviewState extends State<ChatOverview> {
                         );
                       },
                       child: chatOverviewElement(
-                        image:userData?['profile_picture'] ??  placeholderXImage,
+                        image: userData?['profile_picture'] ??  placeholderXImage,
                         name: userData?['name'] ?? 'Unknown',
                         message_preview: lastMessage ??
                             'this could be your first message',

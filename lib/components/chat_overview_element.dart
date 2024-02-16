@@ -3,6 +3,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mensa_match/constants/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mensa_match/pages/chat.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io';
 
 import '../pages/match_popup.dart';
 
@@ -51,7 +53,11 @@ class chatOverviewElement extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 image: DecorationImage(
-                  image: NetworkImage(image!.path),
+                  image: image != null
+                      ? !kIsWeb
+                      ? Image.file(File(image!.path)).image
+                      : NetworkImage(image!.path)
+                      : NetworkImage("https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png"),
                   fit: BoxFit.cover,
                 ),
               ),

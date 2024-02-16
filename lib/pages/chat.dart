@@ -13,6 +13,7 @@ import 'package:mensa_match/components/page_header.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mensa_match/pages/profile_view.dart';
 import 'package:mensa_match/pages/user_info.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class MessagesPage extends StatefulWidget {
   final String match_id;
@@ -105,7 +106,7 @@ class _MessagesPageState extends State<MessagesPage> {
   }
 
   Future<bool> isSender(String id) async {
-    return database.isSender(id);
+    return await database.isSender(id);
   }
 
   showAlert({required String title, required String text}) {
@@ -209,7 +210,11 @@ class _MessagesPageState extends State<MessagesPage> {
                                       CircleAvatar(
                                         radius: 24,
                                         backgroundImage:
-                                            NetworkImage(imageUrl!.path),
+                                        imageUrl != null
+                                            ? !kIsWeb
+                                            ? Image.file(io.File(imageUrl!.path)).image
+                                            : NetworkImage(imageUrl!.path)
+                                            : NetworkImage("https://static.wikia.nocookie.net/spongebob/images/5/5c/Spongebob-squarepants.png"),
                                       ),
                                       const SizedBox(height: 8),
                                       Text(

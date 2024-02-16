@@ -112,13 +112,13 @@ class DatabaseAPI {
 
   Future<bool> isSender(String id) async {
     try {
+      await auth.loadUser();
       final document = await databases.getDocument(
         databaseId: APPWRITE_DATABASE_ID,
         collectionId: COLLECTION_MESSAGES,
         documentId: id,
       );
-
-      final userId = document.data['user_id'];
+      final userId = await document.data['user_id'];
       return userId == auth.userid;
     } catch (e) {
       print("Error in isSender(): $e");
@@ -513,6 +513,7 @@ class DatabaseAPI {
     if (pic_id == "") {
       pic_id = (await auth.userid)!;
     }
+    print("pic_id: $pic_id");
     try{
       if(kIsWeb) {
         Uint8List result = await storage.getFileDownload(bucketId: COLLECTION_Images, fileId: pic_id);
@@ -521,7 +522,7 @@ class DatabaseAPI {
       }else{
         final directory = await getApplicationDocumentsDirectory();
         Uint8List result = await storage.getFileDownload(bucketId: COLLECTION_Images, fileId: pic_id);
-        final tempFile = io.File('${directory.path}/temp_image');
+        final tempFile = io.File('${directory.path}/temp_image$pic_id');
         await tempFile.writeAsBytes(result);
         return XFile(tempFile.path);
       }
